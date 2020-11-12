@@ -1,0 +1,16 @@
+module.exports = {
+  HOME: '/',
+  LOGIN: '/login',
+  LOGOUT: '/logout',
+  USERS: '/users',
+  USER_DETAIL: '/:userId',
+  MEETINGS: '/meetings',
+  MEETING_DETAIL: '/:meetingId',
+  PREFERREDPARTNER: '/preferred-partner',
+  FAVORITEPARTNERS: '/favorite-partners',
+  CHAT: '/chat',
+  JOIN: '/join',
+  HISTORY: '/history',
+  PROMISE: '/promise',
+  PAYMENT: '/PAYMENT',
+};
