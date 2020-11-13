@@ -1,0 +1,15 @@
+const jwt = require('jsonwebtoken');
+
+const authenticateUser = async (req, res, next) => {
+  const token = req.get('token');
+
+  try {
+    const userInfo = jwt.verify(token, process.env.JWT_SECRET);
+    res.locals.userInfo = userInfo;
+    next();
+  } catch (error) {
+    res.status(401).json({ error: 'unauthorized' });
+  }
+};
+
+module.exports = authenticateUser;

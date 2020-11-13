@@ -10,6 +10,12 @@ const LocationSchema = new Schema({
   lat: { type: Number, required: true },
 });
 
+const PreferredPartnerSchema = new Schema({
+  birthYear: { type: String, required: true },
+  gender: { type: String, required: true },
+  occupation: [{ type: String, required: true }],
+});
+
 const UserSchema = new Schema(
   {
     email: { type: String, required: true },
@@ -17,12 +23,12 @@ const UserSchema = new Schema(
     gender: { type: String, required: true },
     birthYear: { type: String, required: true },
     occupation: { type: String, required: true },
-    preferredPartner: { type: String },
-    favoritePartners: [{ type: Schema.Types.ObjectId, ref: 'Voting' }],
+    preferredPartner: { type: PreferredPartnerSchema },
+    favoritePartners: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     history: [{ type: Schema.Types.ObjectId, ref: 'Meeting' }],
     promise: { type: Number, required: true, default: 5 },
     payment: { type: Schema.Types.ObjectId, ref: 'Payment' },
-    location: { type: LocationSchema, required: true },
+    location: { type: LocationSchema },
   },
   schemaOptions
 );
