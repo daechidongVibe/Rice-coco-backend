@@ -34,3 +34,19 @@ exports.signup = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.updatePreferPartner = async (req, res, next) => {
+  const { userId } = req.params;
+  const preferredPartner = req.body;
+
+  try {
+    await userService.updatePreferPartner( userId, preferredPartner);
+
+    res.status(201).json({ result: 'ok' });
+
+  } catch (err) {
+    res.status(500).json({ result: 'failure', errMessage: "We can't update for unknown reasons" });
+
+    next(error);
+  }
+};
