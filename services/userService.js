@@ -1,6 +1,6 @@
 const User = require('../models/User');
 
-exports.login = async (email) => {
+exports.login = async email => {
   try {
     return await User.findOne(
       { email },
@@ -12,9 +12,21 @@ exports.login = async (email) => {
   }
 };
 
-exports.signup = async (userInfo) => {
+exports.signup = async userInfo => {
   try {
     return await User.create(userInfo);
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
+};
+
+exports.updatePreferPartner = async ( userId, preferredPartner ) => {
+  try {
+    return await User.update(
+      { _id: userId },
+      {preferredPartner},
+    );
   } catch (err) {
     console.error(err);
     next(err);
