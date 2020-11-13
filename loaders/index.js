@@ -4,7 +4,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors');
 
-const initLoaders = (app) => {
+const initLoaders = app => {
   app.set('views', path.join(__dirname, '/../views'));
   app.set('view engine', 'pug');
 

@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const userService = require('../services/userService');
+const response = require('../constants/response');
 
 exports.login = async (req, res, next) => {
   const { email } = req.body;
@@ -8,15 +9,15 @@ exports.login = async (req, res, next) => {
     const user = await userService.login(email);
 
     if (!user) {
-      return res.status(200).json({ result: 'no member information' });
+      return res.status(200).json({ result: response.CAN_NOT_FIND });
     }
 
     const { _id: userId } = user;
     const token = jwt.sign({ userId, email }, process.env.JWT_SECRET);
 
-    res.status(200).json({ result: 'ok', user, token });
+    res.status(200).json({ result: response.OK, user, token });
   } catch (error) {
-    res.status(500).json({ result: 'failure' });
+    res.status(500).json({ result: response.FAILURE });
     next(error);
   }
 };
@@ -28,9 +29,9 @@ exports.signup = async (req, res, next) => {
     const { _id: userId, email } = await userService.signup(userInfo);
     const token = jwt.sign({ userId, email }, process.env.JWT_SECRET);
 
-    res.status(201).json({ result: 'ok', token });
+    res.status(201).json({ result: response.OK, token });
   } catch (error) {
-    res.status(500).json({ result: 'failure' });
+    res.status(500).json({ result: response.FAILURE });
     next(error);
   }
 };
@@ -40,13 +41,10 @@ exports.updatePreferPartner = async (req, res, next) => {
   const preferredPartner = req.body;
 
   try {
-    await userService.updatePreferPartner( userId, preferredPartner);
-
-    res.status(201).json({ result: 'ok' });
-
+    await userService.updatePreferPartner(userId, preferredPartner);
+    res.status(201).json({ result: response.OK });
   } catch (err) {
-    res.status(500).json({ result: 'failure', errMessage: "We can't update for unknown reasons" });
-
+    res.status(500).json({ result: response.FAILURE, errMessage: response.CAN_NOT_FIND });
     next(error);
   }
 };
