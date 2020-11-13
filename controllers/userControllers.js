@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const userService = require('../services/userService');
-const response = require('../constants/response');
+const RESPONSE = require('../constants/response');
 
 exports.login = async (req, res, next) => {
   const { email } = req.body;
@@ -9,15 +9,15 @@ exports.login = async (req, res, next) => {
     const user = await userService.login(email);
 
     if (!user) {
-      return res.status(200).json({ result: response.CAN_NOT_FIND });
+      return res.status(200).json({ result: RESPONSE.CAN_NOT_FIND });
     }
 
     const { _id: userId } = user;
     const token = jwt.sign({ userId, email }, process.env.JWT_SECRET);
 
-    res.status(200).json({ result: response.OK, user, token });
+    res.status(200).json({ result: RESPONSE.OK, user, token });
   } catch (error) {
-    res.status(500).json({ result: response.FAILURE });
+    res.status(500).json({ result: RESPONSE.FAILURE });
     next(error);
   }
 };
@@ -29,9 +29,9 @@ exports.signup = async (req, res, next) => {
     const { _id: userId, email } = await userService.signup(userInfo);
     const token = jwt.sign({ userId, email }, process.env.JWT_SECRET);
 
-    res.status(201).json({ result: response.OK, token });
+    res.status(201).json({ result: RESPONSE.OK, token });
   } catch (error) {
-    res.status(500).json({ result: response.FAILURE });
+    res.status(500).json({ result: RESPONSE.FAILURE });
     next(error);
   }
 };
@@ -42,9 +42,9 @@ exports.updatePreferPartner = async (req, res, next) => {
 
   try {
     await userService.updatePreferPartner(userId, preferredPartner);
-    res.status(201).json({ result: response.OK });
+    res.status(201).json({ result: RESPONSE.OK });
   } catch (err) {
-    res.status(500).json({ result: response.FAILURE, errMessage: response.CAN_NOT_FIND });
+    res.status(500).json({ result: RESPONSE.FAILURE, errMessage: RESPONSE.CAN_NOT_FIND });
     next(error);
   }
 };
