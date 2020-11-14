@@ -1,6 +1,6 @@
 const User = require('../models/User');
 
-exports.login = async (email) => {
+exports.login = async email => {
   try {
     return await User.findOne(
       { email },
@@ -12,9 +12,27 @@ exports.login = async (email) => {
   }
 };
 
-exports.signup = async (userInfo) => {
+exports.signup = async userInfo => {
   try {
-    return await User.create(userInfo);
+    const {
+      _id,
+      nickname,
+      gender,
+      occupation,
+      birthYear,
+      email,
+      favoritePartners,
+    } = await User.create(userInfo);
+
+    return {
+      _id,
+      nickname,
+      gender,
+      occupation,
+      birthYear,
+      email,
+      favoritePartners,
+    };
   } catch (err) {
     console.error(err);
     next(err);
