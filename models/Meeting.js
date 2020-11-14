@@ -23,14 +23,14 @@ const ChatSchema = new Schema({
 
 const ParticipantSchema = new Schema({
   _id: { type: Schema.Types.ObjectId, ref: 'User' },
-  isArrived: { type: Boolean, required: true, default: false },
+  isArrived: { type: Boolean, default: false },
 });
 
 const MeetingSchema = new Schema(
   {
     restaurant: { type: RestaurantSchema, required: true },
-    expiredTime: { type: Date, required: true },
-    isMatched: { type: Boolean, required: true, default: false },
+    expiredTime: { type: Date, default: new Date + (60 * 60 * 1000) },
+    isMatched: { type: Boolean, default: false },
     participant: [{ type: ParticipantSchema, required: true }],
     chat: [{ type: ChatSchema }],
   },

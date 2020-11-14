@@ -1,0 +1,18 @@
+[
+  {
+    "restaurant": {
+      "googleId": "thisisrestaurantId",
+      "name": "볼때기아구찜",
+      "location": { "lng": 135, "lat": 25 }
+    },
+    "participant": [ { "_id": "5faf821424411d29a9bf2053" } ]
+  },
+  {
+    "restaurant": {
+      "googleId": "thisissecondrestaurantId",
+      "name": "부자피자",
+      "location": { "lng": 205, "lat": 404 }
+    },
+    "participant": [ { "_id": "5faf8338debead2bc770561f" } ]
+  }
+]

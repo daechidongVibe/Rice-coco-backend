@@ -25,7 +25,7 @@ exports.updatePreferPartner = async ( userId, preferredPartner ) => {
   try {
     return await User.update(
       { _id: userId },
-      {preferredPartner},
+      { preferredPartner },
     );
   } catch (err) {
     console.error(err);

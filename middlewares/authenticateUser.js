@@ -7,9 +7,12 @@ const authenticateUser = async (req, res, next) => {
   try {
     const userInfo = jwt.verify(token, process.env.JWT_SECRET);
     res.locals.userInfo = userInfo;
+
     next();
   } catch (error) {
-    res.status(401).json({ error: RESPONSE.UNAUTHORIZED });
+    res.status(401).json(
+      { error: RESPONSE.UNAUTHORIZED }
+    );
   }
 };
 
