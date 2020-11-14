@@ -14,5 +14,22 @@
       "location": { "lng": 205, "lat": 404 }
     },
     "participant": [ { "_id": "5faf8338debead2bc770561f" } ]
+  },
+  {
+    "restaurant": {
+      "googleId": "thisrestaurantwillnotbefound",
+      "name": "보고 또 보고",
+      "location": { "lng": 80, "lat": 36 },
+      "isMatched": true
+    },
+    "participant": [{ "_id": "unknown1" }]
+  },
+  {
+    "restaurant": {
+      "googleId": "thisismcdonaldsId",
+      "name": "McDonalds",
+      "location": { "lng": 41, "lat": 215 }
+    },
+    "participant": [{ "_id": "unknown1" }, { "_id": "unknown2" }]
   }
 ]
