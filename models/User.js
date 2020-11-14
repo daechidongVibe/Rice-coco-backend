@@ -13,7 +13,7 @@ const LocationSchema = new Schema({
 const PreferredPartnerSchema = new Schema({
   birthYear: { type: String, required: true },
   gender: { type: String, required: true },
-  occupation: [{ type: String, required: true }],
+  occupation: { type: String, required: true },
 });
 
 const UserSchema = new Schema(
