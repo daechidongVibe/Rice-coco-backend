@@ -1,7 +1,15 @@
 const jwt = require('jsonwebtoken');
 const RESPONSE = require('../constants/response');
+const ROUTES = require('../constants/routes');
 
 const authenticateUser = async (req, res, next) => {
+  if (
+    (req.path === ROUTES.USERS + ROUTES.LOGIN) ||
+    (req.path === ROUTES.USERS + ROUTES.SIGNUP)
+    ) {
+    return next();
+  }
+
   const token = req.get('authorization');
 
   try {
