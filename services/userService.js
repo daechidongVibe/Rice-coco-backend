@@ -14,19 +14,34 @@ exports.login = async email => {
 
 exports.signup = async userInfo => {
   try {
-    return await User.create(userInfo);
+    const {
+      _id,
+      nickname,
+      gender,
+      occupation,
+      birthYear,
+      email,
+      favoritePartners,
+    } = await User.create(userInfo);
+
+    return {
+      _id,
+      nickname,
+      gender,
+      occupation,
+      birthYear,
+      email,
+      favoritePartners,
+    };
   } catch (err) {
     console.error(err);
     next(err);
   }
 };
 
-exports.updatePreferPartner = async ( userId, preferredPartner ) => {
+exports.updatePreferPartner = async (userId, preferredPartner) => {
   try {
-    return await User.update(
-      { _id: userId },
-      {preferredPartner},
-    );
+    return await User.update({ _id: userId }, { preferredPartner });
   } catch (err) {
     console.error(err);
     next(err);
