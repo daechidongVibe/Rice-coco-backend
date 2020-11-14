@@ -38,3 +38,12 @@ exports.signup = async userInfo => {
     next(err);
   }
 };
+
+exports.updatePreferPartner = async (userId, preferredPartner) => {
+  try {
+    return await User.update({ _id: userId }, { preferredPartner });
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
+};

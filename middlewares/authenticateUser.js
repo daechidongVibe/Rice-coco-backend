@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const RESPONSE = require('../constants/response');
 
 const authenticateUser = async (req, res, next) => {
   const token = req.get('authorization');
@@ -8,7 +9,7 @@ const authenticateUser = async (req, res, next) => {
     res.locals.userInfo = userInfo;
     next();
   } catch (error) {
-    res.status(401).json({ error: 'unauthorized' });
+    res.status(401).json({ error: RESPONSE.UNAUTHORIZED });
   }
 };
 
