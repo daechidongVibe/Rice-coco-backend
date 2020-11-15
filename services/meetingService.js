@@ -112,14 +112,14 @@ exports.getAllFilteredMeetings = async (userId) => {
             from: "users",
             localField: "participant._id",
             foreignField: "_id",
-            as: "usernickname"
+            as: "participant"
           }
         },
         {
           $project: {
             "_id": 1,
             "restaurant": 1,
-            "usernickname.nickname": 1,
+            "participant.nickname": 1,
             "expiredTime": 1
           }
         },
