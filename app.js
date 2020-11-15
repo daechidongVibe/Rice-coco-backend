@@ -15,7 +15,7 @@ const meetingsRouter = require('./routes/meetingsRouter');
 const verifyToken = require('./middlewares/authenticateUser');
 
 // 로그인과 회원가입을 제외한 모든 요청에 JWT Authentication 적용
-app.use(verifyToken);
+// app.use(verifyToken);
 
 app.use(ROUTES.HOME, homeRouter);
 app.use(ROUTES.USERS, usersRouter);
