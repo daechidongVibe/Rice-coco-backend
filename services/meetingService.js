@@ -99,12 +99,34 @@ exports.getAllFilteredMeetings = async (userId) => {
   // 필터 된 아이디로 미팅 가져오기
   const filteredMeetings = [];
 
+
+  // 해당 크리에이터들이 만든 미팅 정보 가져오기..
   for (let creatorId of filteredCreators) {
-    const meeting = await Meeting.findOne(
-      { participant: { $elemMatch: { _id: creatorId } } }
+    const meeting = await Meeting.aggregate(
+      [
+        { $match:
+          { participant: { $elemMatch: { _id: creatorId } } }
+        },
+        { $unwind: "$participant" },
+        { $lookup: {
+            from: "users",
+            localField: "participant._id",
+            foreignField: "_id",
+            as: "usernickname"
+          }
+        },
+        {
+          $project: {
+            "_id": 1,
+            "restaurant": 1,
+            "usernickname.nickname": 1,
+            "expiredTime": 1
+          }
+        },
+      ]
     );
-    console.log(meeting);
-    filteredMeetings.push(meeting);
+    console.log(meeting[0]);
+    filteredMeetings.push(meeting[0]);
   }
 
   console.log('미팅!!', filteredMeetings);
