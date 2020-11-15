@@ -6,7 +6,6 @@ exports.getAllFilteredMeetings = async (req, res, next) => {
   const { userId } = res.locals.userInfo;
 
   try {
-    await meetingService.getAllFilteredMeetings(userId);
     const filteredMeetings = await meetingService.getAllFilteredMeetings(userId);
 
     return {
