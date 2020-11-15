@@ -1,5 +1,6 @@
 const meetingService = require('../services/meetingService');
 const RESPONSE = require('../constants/response');
+const asd = {}
 
 exports.getAllFilteredMeetings = async (req, res, next) => {
   const { userId } = res.locals.userInfo;
