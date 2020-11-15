@@ -11,7 +11,7 @@ const LocationSchema = new Schema({
 });
 
 const RestaurantSchema = new Schema({
-  googleId: { type: String, required: true },
+  restaurantId: { type: String, required: true },
   name: { type: String, required: true },
   location: { type: LocationSchema, required: true },
 });

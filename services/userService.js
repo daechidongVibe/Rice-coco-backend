@@ -41,7 +41,6 @@ exports.signup = async userInfo => {
 
 exports.updatePreferPartner = async (userId, preferredPartner) => {
   try {
-    console.log(userId);
     return await User.update(
       { _id: userId },
       { preferredPartner },
