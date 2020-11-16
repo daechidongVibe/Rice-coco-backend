@@ -29,7 +29,7 @@ const ParticipantSchema = new Schema({
 const MeetingSchema = new Schema(
   {
     restaurant: { type: RestaurantSchema, required: true },
-    expiredTime: { type: Date, default: new Date + (60 * 60 * 1000) },
+    expiredTime: { type: Date, default: new Date() + (60 * 60 * 1000) },
     isMatched: { type: Boolean, default: false },
     participant: [{ type: ParticipantSchema, required: true }],
     chat: [{ type: ChatSchema }],
