@@ -71,16 +71,11 @@ exports.signup = async (req, res, next) => {
 };
 
 exports.updatePreferPartner = async (req, res, next) => {
-  console.log(res.locals.userInfo);
   const { userId } = res.locals.userInfo;
   const preferredPartner = req.body;
 
-  console.log(userId, preferredPartner);
-
   try {
     const updatedUser = await userService.updatePreferPartner(userId, preferredPartner);
-
-    console.log(updatedUser);
 
     if (updatedUser) {
       res.status(201).json(

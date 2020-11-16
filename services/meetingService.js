@@ -1,11 +1,12 @@
-const Meeting = require("../models/Meeting");
-const User = require("../models/User");
+const Meeting = require('../models/Meeting');
+const User = require('../models/User');
+const { FAILURE, CAN_NOT_FIND } = require('../constants/response');
 
-exports.getAllFilteredMeetings = async (userId) => {
+exports.getAllFilteredMeetings = async userId => {
   // 먼저 내 정보 가져오기 (선호하는 파트너 기준)
   const { preferredPartner } = await User.findOne({ _id: userId });
 
-  const [ result ] = await Meeting.aggregate(
+  const [result] = await Meeting.aggregate(
     [
       {
         $match: {
@@ -85,11 +86,11 @@ exports.getAllFilteredMeetings = async (userId) => {
       isMatchedGender &&
       isMatchedOccupation &&
       isMatchedBirthYear
-      ) {
+    ) {
       isMatchedPartner = true;
     }
 
-    if(isMatchedPartner) {
+    if (isMatchedPartner) {
       filteredCreators.push(_id);
     }
   }
@@ -104,11 +105,13 @@ exports.getAllFilteredMeetings = async (userId) => {
   for (let creatorId of filteredCreators) {
     const meeting = await Meeting.aggregate(
       [
-        { $match:
-          { participant: { $elemMatch: { _id: creatorId } } }
+        {
+          $match:
+            { participant: { $elemMatch: { _id: creatorId } } }
         },
         { $unwind: "$participant" },
-        { $lookup: {
+        {
+          $lookup: {
             from: "users",
             localField: "participant._id",
             foreignField: "_id",
@@ -132,4 +135,26 @@ exports.getAllFilteredMeetings = async (userId) => {
   console.log('미팅!!', filteredMeetings);
 
   return filteredMeetings;
+};
+
+exports.getMeetingDetail = async meetingId => {
+  try {
+    const meetingDetails = await Meeting.findOne({ _id: meetingId });
+
+    if (!meetingDetails || meetingDetails.isMatched) return;
+
+    const partnerId = meetingDetails.participant[0]._id;
+    const { nickname: PartnerNickname } = await User.findOne({ _id: partnerId });
+
+    if (!partnerId) return;
+
+    return  {
+      roomId: meetingDetails._id,
+      restaurant: meetingDetails.restaurant,
+      partner: PartnerNickname,
+    };
+
+  } catch (err) {
+    return err;
+  }
 };
