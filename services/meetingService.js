@@ -11,21 +11,16 @@ exports.createMeeting = async ({ selectedMeeting, userId }) => {
         name: restaurantName,
         location: restaurantLocation
       },
-      participant: [ { _id: userId } ],
+      participant: [{ _id: userId }],
     });
-
-    console.log('새롭게 만들어진 미팅...=>', createdMeeting);
 
     return createdMeeting;
   } catch (err) {
-    console.log('미팅을 생성하던 중 에러가 발생하였습니다!', err);
-
     return err;
   }
 };
 
 exports.getAllFilteredMeetings = async userId => {
-  // 먼저 내 정보 가져오기 (선호하는 파트너 기준)
   const { preferredPartner } = await User.findOne({ _id: userId });
 
   const [result] = await Meeting.aggregate(
@@ -59,7 +54,7 @@ exports.getAllFilteredMeetings = async userId => {
     ]
   );
 
-  // console.log('필터전', result.creators);
+  console.log('필터전', result.creators);
 
   const filteredCreators = [];
 
@@ -117,7 +112,7 @@ exports.getAllFilteredMeetings = async userId => {
     }
   }
 
-  // console.log('필터후', filteredCreators);
+  console.log('필터후', filteredCreators);
 
   // 필터 된 아이디로 미팅 가져오기
   const filteredMeetings = [];
@@ -156,7 +151,7 @@ exports.getAllFilteredMeetings = async userId => {
     filteredMeetings.push(meeting[0]);
   }
 
-  // console.log('미팅!!', filteredMeetings);
+  console.log('미팅!!', filteredMeetings);
 
   return filteredMeetings;
 };
@@ -176,9 +171,9 @@ exports.getMeetingDetail = async meetingId => {
       restaurantId,
       location: restaurantLocation,
       name: restaurantName
-     } = meetingDetails.restaurant;
+    } = meetingDetails.restaurant;
 
-    return  {
+    return {
       expiredTime: meetingDetails.expiredTime,
       meetingId: meetingDetails._id,
       partnerNickname,
@@ -200,6 +195,25 @@ exports.joinMeeting = async (meetingId, userId) => {
         $set: { isMatched: true }
       }
     );
+  } catch (err) {
+    return err;
+  }
+};
+
+exports.updateMeeting = async meetingId => {
+  try {
+    return await Meeting.findOneAndUpdate(
+      { _id: meetingId },
+      { isMatched: true }
+    );
+  } catch (err) {
+    return err;
+  }
+};
+
+exports.deleteMeeting = async meetingId => {
+  try {
+    return await Meeting.deleteOne({ _id: meetingId });
   } catch (err) {
     return err;
   }
