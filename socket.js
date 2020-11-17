@@ -8,10 +8,8 @@ const initSocket = server => {
 
   io.on('connection', socket => {
     socket.on('join meeting', async data => {
-
-      console.log('connection');
       const { meetingId, user } = data;
-
+      console.log('socket connection');
       const currentMeeting = {
         meetingId: '',
         users: [],
@@ -22,9 +20,8 @@ const initSocket = server => {
       currentMeetingList.push(currentMeeting);
 
       // if (currentMeeting.users.length === 2) {
-      //   await Meeting.update({_id: meetingId}, {isMatched: true});
+      //   await Meeting.update({_id: meetingId}, {isMatched: true}); //memo: 서비스로직으로 분리하기
       // }
-      console.log('datadata', data);
       socket.join(meetingId);
       io.to(meetingId).emit('current meeting', currentMeeting);
     });
@@ -33,7 +30,7 @@ const initSocket = server => {
       const { meetingId } = data;
 
      try {
-      await Meeting.deleteOne({_id: meetingId });
+      await Meeting.deleteOne({_id: meetingId }); //memo: 서비스로직으로 분리하기
 
       socket.leave(meetingId);
      } catch (err) {

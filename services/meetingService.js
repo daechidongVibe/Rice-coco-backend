@@ -1,6 +1,5 @@
 const Meeting = require('../models/Meeting');
 const User = require('../models/User');
-const { FAILURE, CAN_NOT_FIND } = require('../constants/response');
 
 exports.createMeeting = async ({ selectedMeeting, userId }) => {
   const { restaurantId, restaurantName, restaurantLocation } = selectedMeeting;
@@ -60,7 +59,7 @@ exports.getAllFilteredMeetings = async userId => {
     ]
   );
 
-  console.log('필터전', result.creators);
+  // console.log('필터전', result.creators);
 
   const filteredCreators = [];
 
@@ -71,8 +70,8 @@ exports.getAllFilteredMeetings = async userId => {
       { _id },
       { _id: 0 }
     );
-    console.log(creator);
-    console.log(preferredPartner);
+    // console.log(creator);
+    // console.log(preferredPartner);
     const { gender, birthYear, occupation } = creator;
     const {
       gender: preferredGender,
@@ -103,7 +102,7 @@ exports.getAllFilteredMeetings = async userId => {
         break;
     }
 
-    console.log(isMatchedGender, isMatchedOccupation, isMatchedBirthYear);
+    // console.log(isMatchedGender, isMatchedOccupation, isMatchedBirthYear);
 
     if (
       isMatchedGender &&
@@ -118,7 +117,7 @@ exports.getAllFilteredMeetings = async userId => {
     }
   }
 
-  console.log('필터후', filteredCreators);
+  // console.log('필터후', filteredCreators);
 
   // 필터 된 아이디로 미팅 가져오기
   const filteredMeetings = [];
@@ -153,11 +152,11 @@ exports.getAllFilteredMeetings = async userId => {
         },
       ]
     );
-    console.log(meeting[0]);
+    // console.log(meeting[0]);
     filteredMeetings.push(meeting[0]);
   }
 
-  console.log('미팅!!', filteredMeetings);
+  // console.log('미팅!!', filteredMeetings);
 
   return filteredMeetings;
 };
@@ -202,8 +201,6 @@ exports.joinMeeting = async (meetingId, userId) => {
       }
     );
   } catch (err) {
-    console.log('미팅 데이터 업데이트 중 에러 발생..', err);
-
     return err;
   }
 };

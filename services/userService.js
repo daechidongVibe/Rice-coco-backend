@@ -60,7 +60,7 @@ exports.updatePromise = async (userId, amount) => {
 
     return updatedUser;
   } catch (err) {
-    console.log('유저 프로미스 업데이트 중 오류 발생!', err);
-    return err;
+    console.error(err);
+    next(err);
   }
 };

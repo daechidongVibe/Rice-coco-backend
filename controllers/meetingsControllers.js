@@ -1,7 +1,5 @@
 const meetingService = require('../services/meetingService');
-const userService = require('../services/userService');
 const RESPONSE = require('../constants/response');
-const Meeting = require('../models/Meeting');
 
 exports.createMeeting = async (req, res, next) => {
   try {
@@ -45,8 +43,7 @@ exports.getMeetingDetail = async (req, res, next) => {
     const meetingDetails = await meetingService.getMeetingDetail(meetingId);
 
     if (meetingDetails) {
-      res.status(201).json(
-        {
+      res.status(201).json({
           result: RESPONSE.OK,
           ...meetingDetails
         }
@@ -68,8 +65,6 @@ exports.joinMeeting = async (req, res, next) => {
 
   try {
     const updatedMeeting = await meetingService.joinMeeting(meetingId, userId);
-
-    console.log(updatedMeeting);
 
     res.json({
       result: RESPONSE.CAN_NOT_UPDATE,
