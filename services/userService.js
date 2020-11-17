@@ -4,7 +4,13 @@ exports.login = async email => {
   try {
     return await User.findOne(
       { email },
-      { history: 0, location: 0, updated_at: 0, created_at: 0, __v: 0 }
+      {
+        history: 0,
+        location: 0,
+        updated_at: 0,
+        created_at: 0,
+        __v: 0
+      }
     );
   } catch (err) {
     console.error(err);
@@ -41,10 +47,12 @@ exports.signup = async userInfo => {
 
 exports.updatePreferPartner = async (userId, preferredPartner) => {
   try {
-    return await User.findOneAndUpdate(
+    const updatedUser = await User.findOneAndUpdate(
       { _id: userId },
       { preferredPartner },
     );
+
+    return updatedUser;
   } catch (err) {
     console.error(err);
     next(err);

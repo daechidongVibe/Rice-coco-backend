@@ -21,9 +21,17 @@ exports.createMeeting = async ({ selectedMeeting, userId }) => {
 };
 
 exports.getAllFilteredMeetings = async userId => {
-  const { preferredPartner } = await User.findOne({ _id: userId });
+  const user = await User.findOne({ _id: userId });
 
-  const [result] = await Meeting.aggregate(
+  if (!user) {
+    return {
+      error: '유저가 없습니다! 로그인은 제대로 되었나요?'
+    }
+  }
+
+  const { preferredPartner } = user;
+
+  const [ result ] = await Meeting.aggregate(
     [
       {
         $match: {
@@ -54,19 +62,18 @@ exports.getAllFilteredMeetings = async userId => {
     ]
   );
 
-  console.log('필터전', result.creators);
+  console.log('미팅을 생성한 모든 유저 아이디..', result.creators);
 
   const filteredCreators = [];
 
-  for (let _id of result.creators) {
+  for (let creatorId of result.creators) {
     let isMatchedPartner = false;
 
     const creator = await User.findOne(
-      { _id },
+      { _id: creatorId },
       { _id: 0 }
     );
-    // console.log(creator);
-    // console.log(preferredPartner);
+
     const { gender, birthYear, occupation } = creator;
     const {
       gender: preferredGender,
@@ -74,7 +81,6 @@ exports.getAllFilteredMeetings = async userId => {
       occupation: preferredOccupation
     } = preferredPartner;
 
-    // 크리에이터의 신상(?)과 preferredPartener의 조건을 비교하여 isMatchedPartner 인지 확인하자
     const isMatchedGender = gender === preferredGender ? true : false;
     const isMatchedOccupation = occupation === preferredOccupation ? true : false;
     let isMatchedBirthYear = false;
@@ -97,7 +103,7 @@ exports.getAllFilteredMeetings = async userId => {
         break;
     }
 
-    // console.log(isMatchedGender, isMatchedOccupation, isMatchedBirthYear);
+    console.log(isMatchedGender, isMatchedOccupation, isMatchedBirthYear);
 
     if (
       isMatchedGender &&
@@ -108,15 +114,14 @@ exports.getAllFilteredMeetings = async userId => {
     }
 
     if (isMatchedPartner) {
-      filteredCreators.push(_id);
+      filteredCreators.push(creatorId);
     }
   }
 
-  console.log('필터후', filteredCreators);
+  console.log('선호 조건으로 필터링 된 유저 아이디..', filteredCreators);
 
   // 필터 된 아이디로 미팅 가져오기
   const filteredMeetings = [];
-
 
   // 해당 크리에이터들이 만든 미팅 정보 가져오기..
   for (let creatorId of filteredCreators) {
@@ -147,11 +152,11 @@ exports.getAllFilteredMeetings = async userId => {
         },
       ]
     );
-    // console.log(meeting[0]);
+
     filteredMeetings.push(meeting[0]);
   }
 
-  console.log('미팅!!', filteredMeetings);
+  console.log('필터링 된 미팅들!!', filteredMeetings);
 
   return filteredMeetings;
 };
