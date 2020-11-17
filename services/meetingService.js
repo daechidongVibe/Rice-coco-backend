@@ -11,15 +11,11 @@ exports.createMeeting = async ({ selectedMeeting, userId }) => {
         name: restaurantName,
         location: restaurantLocation
       },
-      participant: [ { _id: userId } ],
+      participant: [{ _id: userId }],
     });
-
-    console.log('새롭게 만들어진 미팅...=>', createdMeeting);
 
     return createdMeeting;
   } catch (err) {
-    console.log('미팅을 생성하던 중 에러가 발생하였습니다!', err);
-
     return err;
   }
 };
@@ -180,9 +176,9 @@ exports.getMeetingDetail = async meetingId => {
       restaurantId,
       location: restaurantLocation,
       name: restaurantName
-     } = meetingDetails.restaurant;
+    } = meetingDetails.restaurant;
 
-    return  {
+    return {
       expiredTime: meetingDetails.expiredTime,
       meetingId: meetingDetails._id,
       partnerNickname,
@@ -204,6 +200,25 @@ exports.joinMeeting = async (meetingId, userId) => {
         $set: { isMatched: true }
       }
     );
+  } catch (err) {
+    return err;
+  }
+};
+
+exports.updateMeeting = async meetingId => {
+  try {
+    return await Meeting.findOneAndUpdate(
+      { _id: meetingId },
+      { isMatched: true }
+    );
+  } catch (err) {
+    return err;
+  }
+};
+
+exports.deleteMeeting = async meetingId => {
+  try {
+    return await Meeting.deleteOne({ _id: meetingId });
   } catch (err) {
     return err;
   }

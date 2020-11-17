@@ -3,17 +3,9 @@ const meetingsRouter = express.Router();
 const meetingsControllers = require('../controllers/meetingsControllers');
 const ROUTES = require('../constants/routes');
 
-// CREATE MEETING
-meetingsRouter.post(
-  '/',
-  meetingsControllers.createMeeting
-);
+meetingsRouter.post('/', meetingsControllers.createMeeting);
 
-// READ MEETINGS
-meetingsRouter.get(
-  '/',
-  meetingsControllers.getAllFilteredMeetings
-);
+meetingsRouter.get('/', meetingsControllers.getAllFilteredMeetings);
 
 // READ A MEETING BY MEETING ID
 meetingsRouter.get(
@@ -33,10 +25,6 @@ meetingsRouter.put(
   meetingsControllers.joinMeeting
 );
 
-// DELETE A MEETING
-meetingsRouter.delete(
-  ROUTES.MEETING_DETAIL,
-  meetingsControllers.deleteMeeting
-);
+meetingsRouter.delete( ROUTES.MEETING_DETAIL, meetingsControllers.deleteMeeting);
 
 module.exports = meetingsRouter;

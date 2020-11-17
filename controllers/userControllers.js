@@ -65,6 +65,7 @@ exports.signup = async (req, res, next) => {
     res.status(201).json(
       { result: RESPONSE.OK, token, user }
     );
+
   } catch (error) {
     res.status(500).json(
       { result: RESPONSE.FAILURE }
