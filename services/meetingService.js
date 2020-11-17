@@ -8,7 +8,7 @@ exports.createMeeting = async ({ selectedMeeting, userId }) => {
   try {
     const createdMeeting = await Meeting.create({
       restaurant: {
-        _id: restaurantId,
+        restaurantId,
         name: restaurantName,
         location: restaurantLocation
       },
