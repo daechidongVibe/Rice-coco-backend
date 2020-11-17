@@ -49,7 +49,6 @@ exports.login = async (req, res, next) => {
 
 exports.signup = async (req, res, next) => {
   const { userInfo } = req.body;
-  console.log(userInfo);
 
   try {
     const user = await userService.signup(userInfo);
@@ -60,8 +59,9 @@ exports.signup = async (req, res, next) => {
     );
 
     res.status(201).json(
-      { result: RESPONSE.OK, token }
+      { result: RESPONSE.OK, token, user }
     );
+
   } catch (error) {
     res.status(500).json(
       { result: RESPONSE.FAILURE }
@@ -71,7 +71,7 @@ exports.signup = async (req, res, next) => {
 };
 
 exports.updatePreferPartner = async (req, res, next) => {
-  const { userId } = res.locals.userInfo;
+  const { _id :userId } = res.locals.userInfo;
   const preferredPartner = req.body;
 
   try {

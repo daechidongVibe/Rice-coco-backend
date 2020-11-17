@@ -41,7 +41,7 @@ exports.signup = async userInfo => {
 
 exports.updatePreferPartner = async (userId, preferredPartner) => {
   try {
-    return await User.update(
+    return await User.findOneAndUpdate(
       { _id: userId },
       { preferredPartner },
     );

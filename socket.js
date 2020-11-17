@@ -1,5 +1,5 @@
 const socketIo = require('socket.io');
-const Meeting = require('./models/Meeting');
+const meetingService = require('./services/meetingService');
 
 const currentMeetingList = [];
 
@@ -19,19 +19,19 @@ const initSocket = server => {
       currentMeeting.users.push(user);
       currentMeetingList.push(currentMeeting);
 
-      // if (currentMeeting.users.length === 2) {
-      //   await Meeting.update({_id: meetingId}, {isMatched: true}); //memo: 서비스로직으로 분리하기
-      // }
+      if (currentMeeting.users.length === 2) {
+        await meetingService.updateMeeting(meetingId);
+      }
       socket.join(meetingId);
       io.to(meetingId).emit('current meeting', currentMeeting);
     });
 
-    socket.on('disconnect', async data => {
-      const { meetingId } = data;
-
+    socket.on('leave', async data => {
+    const { meetingId } = data;
+      console.log(data);
      try {
-      await Meeting.deleteOne({_id: meetingId }); //memo: 서비스로직으로 분리하기
-
+      await meetingService.deleteMeeting(meetingId);
+      console.log('삭제완료')
       socket.leave(meetingId);
      } catch (err) {
       console.error(err);
