@@ -2,6 +2,29 @@ const Meeting = require('../models/Meeting');
 const User = require('../models/User');
 const { FAILURE, CAN_NOT_FIND } = require('../constants/response');
 
+exports.createMeeting = async ({ selectedMeeting, userId }) => {
+  const { restaurantId, restaurantName, restaurantLocation } = selectedMeeting;
+
+  try {
+    const createdMeeting = await Meeting.create({
+      restaurant: {
+        _id: restaurantId,
+        name: restaurantName,
+        location: restaurantLocation
+      },
+      participant: [ { _id: userId } ],
+    });
+
+    console.log('새롭게 만들어진 미팅...=>', createdMeeting);
+
+    return createdMeeting;
+  } catch (err) {
+    console.log('미팅을 생성하던 중 에러가 발생하였습니다!', err);
+
+    return err;
+  }
+};
+
 exports.getAllFilteredMeetings = async userId => {
   // 먼저 내 정보 가져오기 (선호하는 파트너 기준)
   const { preferredPartner } = await User.findOne({ _id: userId });
@@ -106,8 +129,9 @@ exports.getAllFilteredMeetings = async userId => {
     const meeting = await Meeting.aggregate(
       [
         {
-          $match:
-            { participant: { $elemMatch: { _id: creatorId } } }
+          $match: {
+            participant: { $elemMatch: { _id: creatorId } }
+          }
         },
         { $unwind: "$participant" },
         {
@@ -118,11 +142,12 @@ exports.getAllFilteredMeetings = async userId => {
             as: "participant"
           }
         },
+        { $unwind: "$participant" },
         {
           $project: {
             "_id": 1,
             "restaurant": 1,
-            "participant.nickname": 1,
+            "participant": "$participant.nickname",
             "expiredTime": 1
           }
         },
@@ -144,17 +169,41 @@ exports.getMeetingDetail = async meetingId => {
     if (!meetingDetails || meetingDetails.isMatched) return;
 
     const partnerId = meetingDetails.participant[0]._id;
-    const { nickname: PartnerNickname } = await User.findOne({ _id: partnerId });
+    const { nickname: partnerNickname } = await User.findOne({ _id: partnerId });
 
     if (!partnerId) return;
 
-    return  {
-      roomId: meetingDetails._id,
-      restaurant: meetingDetails.restaurant,
-      partner: PartnerNickname,
-    };
+    const {
+      restaurantId,
+      location: restaurantLocation,
+      name: restaurantName
+     } = meetingDetails.restaurant;
 
+    return  {
+      expiredTime: meetingDetails.expiredTime,
+      meetingId: meetingDetails._id,
+      partnerNickname,
+      restaurantId,
+      restaurantLocation,
+      restaurantName,
+    };
   } catch (err) {
+    return err;
+  }
+};
+
+exports.joinMeeting = async (meetingId, userId) => {
+  try {
+    return await Meeting.findOneAndUpdate(
+      { meetingId },
+      {
+        $addToSet: { participant: { _id: userId } },
+        $set: { isMatched: true }
+      }
+    );
+  } catch (err) {
+    console.log('미팅 데이터 업데이트 중 에러 발생..', err);
+
     return err;
   }
 };
