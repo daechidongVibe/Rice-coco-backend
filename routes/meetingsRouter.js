@@ -15,10 +15,16 @@ meetingsRouter.get(
   meetingsControllers.getAllFilteredMeetings
 );
 
-// READ A MEETING
+// READ A MEETING BY MEETING ID
 meetingsRouter.get(
   ROUTES.MEETING_DETAIL,
   meetingsControllers.getMeetingDetail
+);
+
+// READ A MEETING BY USER ID
+meetingsRouter.get(
+  '/user' + ROUTES.USER_DETAIL,
+  meetingsControllers.getMeetingByUserId
 );
 
 // UPDATE A MEETING (JOIN)

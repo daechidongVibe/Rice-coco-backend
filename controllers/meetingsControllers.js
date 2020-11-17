@@ -1,5 +1,8 @@
 const meetingService = require('../services/meetingService');
+const Meeting = require('../models/Meeting');
 const RESPONSE = require('../constants/response');
+const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
 
 exports.createMeeting = async (req, res, next) => {
   try {
@@ -25,13 +28,21 @@ exports.getAllFilteredMeetings = async (req, res, next) => {
   const { userId } = res.locals.userInfo;
 
   try {
-    const filteredMeetings = await meetingService.getAllFilteredMeetings(userId);
+    const result = await meetingService.getAllFilteredMeetings(userId);
+
+    if (result.error) {
+      res.status().json({
+        result: RESPONSE.FAILURE,
+        errMessage: result.error
+      })
+    }
 
     res.status(200).json({
       result: RESPONSE.OK,
-      filteredMeetings
+      filteredMeetings: result
     });
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };
@@ -54,6 +65,24 @@ exports.getMeetingDetail = async (req, res, next) => {
         errMessage: RESPONSE.CAN_NOT_FIND
       });
     }
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getMeetingByUserId = async (req, res, next) => {
+  console.log('안오나..')
+  const { userId } = req.params;
+  console.log(userId);
+  try {
+    const meeting = await Meeting.find({ "participant._id": new ObjectId(userId.toString()) });
+
+    console.log('유저 아이디로 찾아온 미팅! 없을 수도 있다.', meeting);
+
+    res.json({
+      result: RESPONSE.OK,
+      meeting
+    });
   } catch (err) {
     next(err);
   }
