@@ -50,3 +50,17 @@ exports.updatePreferPartner = async (userId, preferredPartner) => {
     next(err);
   }
 };
+
+exports.updatePromise = async (userId, amount) => {
+  try {
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: userId },
+      { $inc: { promise: amount } }
+    );
+
+    return updatedUser;
+  } catch (err) {
+    console.log('유저 프로미스 업데이트 중 오류 발생!', err);
+    return err;
+  }
+};

@@ -101,3 +101,25 @@ exports.updatePreferPartner = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.updatePromise = async (req, res, next) => {
+  const { amount } = req.body;
+  const { userId } = res.locals;
+
+  try {
+    const updatedUser = await userService.updatePromise(userId, amount);
+
+    if (updatedUser) {
+      res.json({
+        result: RESPONSE.OK,
+        updatedUser
+      });
+    } else {
+      res.json({
+        result: RESPONSE.CAN_NOT_UPDATE
+      });
+    }
+  } catch (err) {
+    next(err);
+  }
+};

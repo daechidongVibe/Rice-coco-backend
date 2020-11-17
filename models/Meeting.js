@@ -6,8 +6,8 @@ const schemaOptions = {
 };
 
 const LocationSchema = new Schema({
-  lng: { type: Number, required: true },
-  lat: { type: Number, required: true },
+  latitude: { type: Number, required: true },
+  longitude: { type: Number, required: true },
 });
 
 const RestaurantSchema = new Schema({
