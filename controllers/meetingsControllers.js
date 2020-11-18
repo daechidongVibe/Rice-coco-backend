@@ -49,22 +49,25 @@ exports.getAllFilteredMeetings = async (req, res, next) => {
 
 exports.getMeetingDetail = async (req, res, next) => {
   const { meetingId } = req.params;
+  const { userId } = res.locals.userInfo;
 
   try {
-    const meetingDetails = await meetingService.getMeetingDetail(meetingId);
+    const meetingDetails = await meetingService.getMeetingDetail(meetingId, userId);
+
+    console.log(meetingDetails);
 
     if (meetingDetails) {
-      res.status(201).json({
+      return res.status(201).json({
           result: RESPONSE.OK,
-          ...meetingDetails
+          meetingDetails
         }
       );
-    } else {
-      res.json({
-        result: RESPONSE.FAILURE,
-        errMessage: RESPONSE.CAN_NOT_FIND
-      });
     }
+
+    return res.json({
+      result: RESPONSE.FAILURE,
+      errMessage: RESPONSE.CAN_NOT_FIND
+    });
   } catch (err) {
     next(err);
   }
@@ -94,10 +97,16 @@ exports.joinMeeting = async (req, res, next) => {
 
   try {
     const updatedMeeting = await meetingService.joinMeeting(meetingId, userId);
+    console.log('조인 성공한 미팅 정보!', updatedMeeting);
+    if (updatedMeeting) {
+      return res.json({
+        result: RESPONSE.OK,
+        updatedMeeting
+      });
+    }
 
     res.json({
-      result: RESPONSE.CAN_NOT_UPDATE,
-      updatedMeeting
+      result: RESPONSE.CAN_NOT_UPDATE
     });
   } catch (err) {
     next(err);

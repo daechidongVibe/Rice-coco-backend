@@ -31,7 +31,7 @@ exports.getAllFilteredMeetings = async userId => {
 
   const { preferredPartner } = user;
 
-  const [ result ] = await Meeting.aggregate(
+  const result = await Meeting.aggregate(
     [
       {
         $match: {
@@ -62,11 +62,19 @@ exports.getAllFilteredMeetings = async userId => {
     ]
   );
 
-  console.log('미팅을 생성한 모든 유저 아이디..', result.creators);
+  console.log('aggregate 결과..', result, typeof result);
+
+  // 유저의 선호 조건에 맞는 사람들을 찾을 수 없었을 때
+  if (!result.length) {
+    console.log('빈 배열 리턴!');
+    return result; // 빈 배열 리턴
+  }
+
+  const [ { creators } ] = result;
 
   const filteredCreators = [];
 
-  for (let creatorId of result.creators) {
+  for (let creatorId of creators) {
     let isMatchedPartner = false;
 
     const creator = await User.findOne(
@@ -161,30 +169,54 @@ exports.getAllFilteredMeetings = async userId => {
   return filteredMeetings;
 };
 
-exports.getMeetingDetail = async meetingId => {
+exports.getMeetingDetail = async (_id, userId) => {
   try {
-    const meetingDetails = await Meeting.findOne({ _id: meetingId });
+    const meetingDetails = await Meeting.findOne({ _id });
 
-    if (!meetingDetails || meetingDetails.isMatched) return;
+    console.log('미팅 디테일즈..', meetingDetails);
 
-    const partnerId = meetingDetails.participant[0]._id;
-    const { nickname: partnerNickname } = await User.findOne({ _id: partnerId });
+    // 유저가 보내온 미팅 아이디에 해당하는 미팅을 찾을 수 없을 때
+    if (!meetingDetails) {
+      return {
+        status: 'FAILURE',
+        errMessage: '해당 미팅 정보를 찾을 수 없습니다'
+      };
+    }
 
-    if (!partnerId) return;
+    // 미팅이 있다면 까준다(?)
+    const { expiredTime, restaurant, participant } = meetingDetails;
 
     const {
       restaurantId,
       location: restaurantLocation,
       name: restaurantName
-    } = meetingDetails.restaurant;
+    } = restaurant;
 
+    // 미팅 참여자가 1 => 크리에이트 이후 보낸 요청
+    if (meetingDetails.participant.length === 1) {
+      return {
+        status: 'SUCCESS',
+        data: {
+          restaurantName,
+          expiredTime
+        }
+      };
+    }
+
+    // 미팅 참여자가 1이 아니다 (2다) => 조인 이후 보낸 요청
+    const partnerId = participant.find(obj => obj._id !== userId)._id;
+    console.log('파트너 아이디..', partnerId);
+    const { nickname: partnerNickname } = await User.findOne({ _id: partnerId });
+    console.log('파트너 아이디로 가져온 파트너 닉네임..', partnerNickname);
     return {
-      expiredTime: meetingDetails.expiredTime,
-      meetingId: meetingDetails._id,
-      partnerNickname,
-      restaurantId,
-      restaurantLocation,
-      restaurantName,
+      status: 'SUCCESS',
+      data: {
+        expiredTime,
+        partnerNickname,
+        restaurantId,
+        restaurantLocation,
+        restaurantName,
+      }
     };
   } catch (err) {
     return err;
@@ -194,11 +226,12 @@ exports.getMeetingDetail = async meetingId => {
 exports.joinMeeting = async (meetingId, userId) => {
   try {
     return await Meeting.findOneAndUpdate(
-      { meetingId },
+      { _id: meetingId },
       {
         $addToSet: { participant: { _id: userId } },
         $set: { isMatched: true }
-      }
+      },
+      { new: true }
     );
   } catch (err) {
     return err;
