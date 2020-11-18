@@ -75,13 +75,13 @@ exports.getMeetingByUserId = async (req, res, next) => {
   const { userId } = req.params;
   console.log(userId);
   try {
-    const meeting = await Meeting.find({ "participant._id": new ObjectId(userId.toString()) });
+    const userMeeting = await Meeting.findOne({ "participant._id": new ObjectId(userId.toString()) });
 
-    console.log('유저 아이디로 찾아온 미팅! 없을 수도 있다.', meeting);
+    console.log('유저 아이디로 찾아온 미팅! 없을 수도 있다.', userMeeting);
 
     res.json({
       result: RESPONSE.OK,
-      meeting
+      userMeeting
     });
   } catch (err) {
     next(err);
