@@ -70,7 +70,7 @@ exports.getAllFilteredMeetings = async userId => {
     return result; // 빈 배열 리턴
   }
 
-  const [ { creators } ] = result;
+  const [{ creators }] = result;
 
   const filteredCreators = [];
 
@@ -238,21 +238,33 @@ exports.joinMeeting = async (meetingId, userId) => {
   }
 };
 
-exports.updateMeeting = async meetingId => {
+exports.deleteMeeting = async meetingId => {
   try {
-    return await Meeting.findOneAndUpdate(
-      { _id: meetingId },
-      { isMatched: true }
+    return await Meeting.findByIdAndRemove({ _id: meetingId });
+  } catch (err) {
+    return err;
+  }
+};
+
+exports.updateChat = async (meetingId, userId, message) => {
+  try {
+    await Meeting.findOneAndUpdate(
+      { '_id': meetingId },
+      { $push: { chat: { userId, message } } },
     );
   } catch (err) {
     return err;
   }
 };
 
-exports.deleteMeeting = async meetingId => {
+exports.getAllFilteredMessages = async meetingId => {
   try {
-    return await Meeting.findByIdAndRemove({ _id: meetingId });
+    const meeting = await Meeting.findOne({ _id: meetingId });
+    const { chat } = meeting.populate('chat');
+
+    console.log(chat);
+    return chat;
   } catch (err) {
-    return err;
+    console.log(err);
   }
 };
