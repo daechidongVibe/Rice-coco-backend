@@ -31,7 +31,7 @@ exports.getAllFilteredMeetings = async (req, res, next) => {
     const result = await meetingService.getAllFilteredMeetings(userId);
 
     if (result.error) {
-      res.status().json({
+      res.json({
         result: RESPONSE.FAILURE,
         errMessage: result.error
       })
@@ -56,17 +56,17 @@ exports.getMeetingDetail = async (req, res, next) => {
 
     console.log(meetingDetails);
 
-    if (meetingDetails) {
+    if (meetingDetails.status === 'SUCCESS') {
       return res.status(201).json({
           result: RESPONSE.OK,
-          meetingDetails
+          meetingDetails: meetingDetails.data
         }
       );
     }
 
     return res.json({
       result: RESPONSE.FAILURE,
-      errMessage: RESPONSE.CAN_NOT_FIND
+      errMessage: meetingDetails.errMessage
     });
   } catch (err) {
     next(err);
