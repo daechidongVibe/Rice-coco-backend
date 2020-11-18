@@ -217,6 +217,7 @@ exports.updateMeeting = async meetingId => {
 };
 
 exports.deleteMeeting = async meetingId => {
+  console.log('미팅아이디', meetingId);
   try {
     return await Meeting.deleteOne({ _id: meetingId });
   } catch (err) {
