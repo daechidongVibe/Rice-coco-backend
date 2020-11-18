@@ -31,7 +31,7 @@ exports.getAllFilteredMeetings = async (req, res, next) => {
     const result = await meetingService.getAllFilteredMeetings(userId);
 
     if (result.error) {
-      res.status().json({
+      res.status(200).json({
         result: RESPONSE.FAILURE,
         errMessage: result.error
       })
@@ -81,7 +81,7 @@ exports.getMeetingByUserId = async (req, res, next) => {
     const userMeeting = await Meeting.findOne({ "participant._id": new ObjectId(userId.toString()) });
 
     console.log('유저 아이디로 찾아온 미팅! 없을 수도 있다.', userMeeting);
-
+    
     res.json({
       result: RESPONSE.OK,
       userMeeting
@@ -97,15 +97,15 @@ exports.joinMeeting = async (req, res, next) => {
 
   try {
     const updatedMeeting = await meetingService.joinMeeting(meetingId, userId);
-    console.log('조인 성공한 미팅 정보!', updatedMeeting);
+ console.log('조인 성공한 미팅 정보!', updatedMeeting);
     if (updatedMeeting) {
-      return res.json({
+      return res.status(200).json({
         result: RESPONSE.OK,
         updatedMeeting
       });
     }
 
-    res.json({
+    res.status(200).json({
       result: RESPONSE.CAN_NOT_UPDATE
     });
   } catch (err) {
@@ -113,6 +113,23 @@ exports.joinMeeting = async (req, res, next) => {
   }
 };
 
-exports.deleteMeeting = (req, res, next) => {
+exports.getAllFilteredMessages = async (req, res, next) => {
+  const { meetingId } = req.params;
 
+  try {
+    const filteredMessages = await meetingService.getAllFilteredMessages(meetingId);
+
+    if(!filteredMessages) {
+      return res.status(200).json({
+        result: RESPONSE.CAN_NOT_FIND
+      });
+    }
+
+    res.status(200).json({
+      result: RESPONSE.OK,
+      filteredMeetings,
+    })
+  }catch(err) {
+    next(err);
+  }
 };
