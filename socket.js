@@ -5,7 +5,6 @@ const currentMeetingList = [];
 
 const initSocket = server => {
   const io = socketIo(server);
-
   io.on('connection', socket => {
     socket.on('join meeting', async data => {
       const { meetingId, user } = data;
@@ -26,12 +25,11 @@ const initSocket = server => {
       io.to(meetingId).emit('current meeting', currentMeeting);
     });
 
-    socket.on('leave', async data => {
-    const { meetingId } = data;
-      console.log(data);
+    socket.on('leaveMeeting', async data => {
+      const meetingId = data;
+
      try {
       await meetingService.deleteMeeting(meetingId);
-      console.log('삭제완료')
       socket.leave(meetingId);
      } catch (err) {
       console.error(err);
