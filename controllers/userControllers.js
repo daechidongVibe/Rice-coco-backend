@@ -52,7 +52,6 @@ exports.login = async (req, res, next) => {
 
 exports.signup = async (req, res, next) => {
   const userInfo = req.body;
-  console.log(userInfo);
 
   try {
     const user = await userService.signup(userInfo);
@@ -61,7 +60,7 @@ exports.signup = async (req, res, next) => {
       { _id, email },
       process.env.JWT_SECRET
     );
-    console.log(user);
+
     res.status(201).json(
       { result: RESPONSE.OK, token, user }
     );

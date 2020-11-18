@@ -25,6 +25,4 @@ meetingsRouter.put(
   meetingsControllers.joinMeeting
 );
 
-meetingsRouter.delete( ROUTES.MEETING_DETAIL, meetingsControllers.deleteMeeting);
-
 module.exports = meetingsRouter;

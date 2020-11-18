@@ -7,7 +7,6 @@ const ObjectId = mongoose.Types.ObjectId;
 exports.createMeeting = async (req, res, next) => {
   try {
     const createdMeeting = await meetingService.createMeeting(req.body);
-
     if (createdMeeting) {
       return res.json({
         result: RESPONSE.OK,
@@ -31,7 +30,7 @@ exports.getAllFilteredMeetings = async (req, res, next) => {
     const result = await meetingService.getAllFilteredMeetings(userId);
 
     if (result.error) {
-      res.status().json({
+      res.status(500).json({
         result: RESPONSE.FAILURE,
         errMessage: result.error
       })
@@ -52,35 +51,29 @@ exports.getMeetingDetail = async (req, res, next) => {
   const { userId } = res.locals.userInfo;
 
   try {
-    const meetingDetails = await meetingService.getMeetingDetail(meetingId, userId);
+    const meetingDetails = await meetingService.getMeetingDetail(meetingId, userId);
 
-    console.log(meetingDetails);
+    if (meetingDetails.status === 'SUCCESS') {
+      return res.status(201).json({
+        result: RESPONSE.OK,
+        meetingDetails: meetingDetails.data
+      });
+    }
 
-    if (meetingDetails) {
-      return res.status(201).json({
-          result: RESPONSE.OK,
-          meetingDetails
-        }
-      );
-    }
-
-    return res.json({
-      result: RESPONSE.FAILURE,
-      errMessage: RESPONSE.CAN_NOT_FIND
-    });
+    return res.json({
+      result: RESPONSE.FAILURE,
+      errMessage: meetingDetails.errMessage
+    });
   } catch (err) {
-    next(err);
+    next(err);
   }
-};
+  };
 
 exports.getMeetingByUserId = async (req, res, next) => {
-  console.log('안오나..')
   const { userId } = req.params;
-  console.log(userId);
+
   try {
     const userMeeting = await Meeting.findOne({ "participant._id": new ObjectId(userId.toString()) });
-
-    console.log('유저 아이디로 찾아온 미팅! 없을 수도 있다.', userMeeting);
 
     res.json({
       result: RESPONSE.OK,
@@ -97,7 +90,7 @@ exports.joinMeeting = async (req, res, next) => {
 
   try {
     const updatedMeeting = await meetingService.joinMeeting(meetingId, userId);
-    console.log('조인 성공한 미팅 정보!', updatedMeeting);
+    // console.log('조인 성공한 미팅 정보!', updatedMeeting);
     if (updatedMeeting) {
       return res.json({
         result: RESPONSE.OK,
@@ -111,8 +104,4 @@ exports.joinMeeting = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-};
-
-exports.deleteMeeting = (req, res, next) => {
-
 };
