@@ -81,7 +81,7 @@ exports.getMeetingByUserId = async (req, res, next) => {
     const userMeeting = await Meeting.findOne({ "participant._id": new ObjectId(userId.toString()) });
 
     console.log('유저 아이디로 찾아온 미팅! 없을 수도 있다.', userMeeting);
-    
+
     res.json({
       result: RESPONSE.OK,
       userMeeting
@@ -124,11 +124,11 @@ exports.getAllFilteredMessages = async (req, res, next) => {
         result: RESPONSE.CAN_NOT_FIND
       });
     }
-
+    console.log('controllers', filteredMessages)
     res.status(200).json({
       result: RESPONSE.OK,
-      filteredMeetings,
-    })
+      filteredMessages,
+    });
   }catch(err) {
     next(err);
   }

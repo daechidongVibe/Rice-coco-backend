@@ -248,7 +248,7 @@ exports.deleteMeeting = async meetingId => {
 
 exports.updateChat = async (meetingId, userId, message) => {
   try {
-    const chat = await Meeting.findOneAndUpdate(
+    await Meeting.findOneAndUpdate(
       { '_id': meetingId },
       { $push: { chat: { userId, message } } },
     );
@@ -263,7 +263,7 @@ exports.getAllFilteredMessages = async meetingId => {
     const { chat } = meeting.populate('chat');
 
     console.log(chat);
-
+    return chat;
   } catch (err) {
     console.log(err);
   }
