@@ -30,7 +30,11 @@ exports.getAllFilteredMeetings = async (req, res, next) => {
     const result = await meetingService.getAllFilteredMeetings(userId);
 
     if (result.error) {
+<<<<<<< HEAD
       res.status(500).json({
+=======
+      res.status(200).json({
+>>>>>>> 6f22f3544b7c79d34155fbe567e70b3e023727fb
         result: RESPONSE.FAILURE,
         errMessage: result.error
       })
@@ -90,18 +94,39 @@ exports.joinMeeting = async (req, res, next) => {
 
   try {
     const updatedMeeting = await meetingService.joinMeeting(meetingId, userId);
-    // console.log('조인 성공한 미팅 정보!', updatedMeeting);
+
     if (updatedMeeting) {
-      return res.json({
+      return res.status(200).json({
         result: RESPONSE.OK,
         updatedMeeting
       });
     }
 
-    res.json({
+    res.status(200).json({
       result: RESPONSE.CAN_NOT_UPDATE
     });
   } catch (err) {
+    next(err);
+  }
+};
+
+exports.getAllFilteredMessages = async (req, res, next) => {
+  const { meetingId } = req.params;
+
+  try {
+    const filteredMessages = await meetingService.getAllFilteredMessages(meetingId);
+
+    if(!filteredMessages) {
+      return res.status(200).json({
+        result: RESPONSE.CAN_NOT_FIND
+      });
+    }
+    console.log('controllers', filteredMessages)
+    res.status(200).json({
+      result: RESPONSE.OK,
+      filteredMessages,
+    });
+  }catch(err) {
     next(err);
   }
 };
