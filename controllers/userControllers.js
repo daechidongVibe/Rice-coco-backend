@@ -75,7 +75,7 @@ exports.signup = async (req, res, next) => {
 };
 
 exports.updatePreferPartner = async (req, res, next) => {
-  const { _id: userId } = res.locals.userInfo;
+  const { userId } = req.params;
   const preferredPartner = req.body;
 
   try {
