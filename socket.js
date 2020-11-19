@@ -35,7 +35,6 @@ const initSocket = server => {
       currentMeetingList.splice(endMeetingIndex, 1);
 
       try {
-        await meetingService.deleteMeeting(meetingId);
         socket.leave(meetingId);
 
       } catch (err) {
