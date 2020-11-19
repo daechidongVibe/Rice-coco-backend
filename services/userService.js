@@ -45,6 +45,20 @@ exports.signup = async userInfo => {
   }
 };
 
+exports.updateUserInfo = async (userId) => {
+  try {
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: userId },
+      {  },
+      { new: true }
+    );
+
+    console.log('업데이트 된 유저! => ', updatedUser);
+  } catch (err) {
+    return err;
+  }
+};
+
 exports.updatePreferPartner = async (userId, preferredPartner) => {
   try {
     const updatedUser = await User.findOneAndUpdate(
