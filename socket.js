@@ -44,7 +44,6 @@ const initSocket = server => {
 
       try {
         socket.leave(meetingId);
-
       } catch (err) {
         console.error(err);
       }
@@ -68,9 +67,24 @@ const initSocket = server => {
 
       currentMeetingList.splice(endMeetingIndex, 1);
 
-      socket.leave(meetingId);
       socket.broadcast.to(meetingId).emit('meeting broke up');
+      socket.leave(meetingId);
+    });
 
+    socket.on('leave meeting', meetingId => {
+      socket.leave(meetingId);
+    });
+
+    socket.on('arrive meeting', meetingId => {
+      const currentMeeting = currentMeetingList.find(
+        meeting => meeting.meetingId === meetingId
+      );
+
+      currentMeeting.arrivalCount
+        ? currentMeeting.arrivalCount++
+        : (currentMeeting.arrivalCount = 1);
+
+      io.to(meetingId).emit('current meeting', currentMeeting);
     });
   });
 };
