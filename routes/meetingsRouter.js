@@ -22,8 +22,14 @@ meetingsRouter.put(
   meetingsControllers.joinMeeting
 );
 
-meetingsRouter.get(ROUTES.MEETING_DETAIL + ROUTES.CHAT,
+meetingsRouter.get(
+  ROUTES.MEETING_DETAIL + ROUTES.CHAT,
   meetingsControllers.getAllFilteredMessages
+);
+
+meetingsRouter.delete(
+  ROUTES.MEETING_DETAIL,
+  meetingsControllers.deleteMeeting
 );
 
 module.exports = meetingsRouter;
