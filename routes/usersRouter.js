@@ -22,4 +22,9 @@ usersRouter.put(
   userControllers.updatePromise
 );
 
+usersRouter.put(
+  ROUTES.USER_DETAIL + ROUTES.FAVORITE_PARTNERS,
+  userControllers.addFavoritePartners
+);
+
 module.exports = usersRouter;

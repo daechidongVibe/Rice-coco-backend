@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const userService = require('../services/userService');
+const meetingService = require('../services/meetingService');
 const RESPONSE = require('../constants/response');
 const User = require('../models/User');
 
@@ -136,4 +137,20 @@ exports.updatePromise = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+
 };
+
+exports.addFavoritePartners = async (req, res, next) => {
+  const { partnerNickname } = req.body;
+  const { userId } = res.locals;
+
+  try {
+    const partnerId = await userService.getPartnerIdByNickname(partnerNickname);
+    const updatedUser = await userService.addFavoritePartners(userId, partnerId);
+
+    res.json({ result: RESPONSE.OK, updatedUser });
+  } catch (err) {
+    res.json({ result: RESPONSE.FAILURE });
+    next(err);
+  }
+}
