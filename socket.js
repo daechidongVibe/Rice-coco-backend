@@ -6,8 +6,6 @@ const currentMeetingList = [];
 const initSocket = server => {
   const io = socketIo(server);
   io.on('connection', socket => {
-    console.log(123);
-
     socket.on('join meeting', async data => {
       const { meetingId, userId } = data;
       const meetingIndex = currentMeetingList.findIndex(
@@ -66,8 +64,9 @@ const initSocket = server => {
       );
 
       currentMeetingList.splice(endMeetingIndex, 1);
-
-      socket.broadcast.to(meetingId).emit('meeting broke up');
+      console.log('break meeting');
+      console.log(currentMeetingList);
+      socket.broadcast.to(meetingId).emit('meeting broked up');
       socket.leave(meetingId);
     });
 
