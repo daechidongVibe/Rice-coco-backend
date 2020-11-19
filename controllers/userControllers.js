@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const userService = require('../services/userService');
 const RESPONSE = require('../constants/response');
+const User = require('../models/User');
 
 exports.login = async (req, res, next) => {
   const token = req.get('authorization');
@@ -70,6 +71,16 @@ exports.signup = async (req, res, next) => {
       { result: RESPONSE.FAILURE }
     );
     next(error);
+  }
+};
+
+exports.updateUserInfo = async (req, res, next) => {
+  const { userId } = res.params;
+
+  try {
+    const result = await userService.updateUserInfo(userId);
+  } catch (err) {
+    next(err);
   }
 };
 

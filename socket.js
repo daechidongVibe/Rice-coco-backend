@@ -41,7 +41,15 @@ const initSocket = server => {
       );
 
       currentMeetingList.splice(endMeetingIndex, 1);
-      socket.leave(meetingId);
+
+      try {
+        socket.leave(meetingId);
+
+      } catch (err) {
+        console.error(err);
+      }
+
+      console.log(currentMeetingList);
     });
 
     socket.on('end meeting', meetingId => {
