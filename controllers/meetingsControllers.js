@@ -30,11 +30,7 @@ exports.getAllFilteredMeetings = async (req, res, next) => {
     const result = await meetingService.getAllFilteredMeetings(userId);
 
     if (result.error) {
-<<<<<<< HEAD
       res.status(500).json({
-=======
-      res.status(200).json({
->>>>>>> 6f22f3544b7c79d34155fbe567e70b3e023727fb
         result: RESPONSE.FAILURE,
         errMessage: result.error
       })
@@ -55,19 +51,20 @@ exports.getMeetingDetail = async (req, res, next) => {
   const { userId } = res.locals.userInfo;
 
   try {
-    const meetingDetails = await meetingService.getMeetingDetail(meetingId, userId);
+    const meetingDetails = await meetingService.getMeetingDetail(meetingId, userId);
 
-    if (meetingDetails.status === 'SUCCESS') {
-      return res.status(201).json({
-        result: RESPONSE.OK,
-        meetingDetails: meetingDetails.data
-      });
-    }
+    if (meetingDetails.status === 'SUCCESS') {
+      return res.status(201).json({
+          result: RESPONSE.OK,
+          meetingDetails: meetingDetails.data
+        }
+      );
+    }
 
-    return res.json({
-      result: RESPONSE.FAILURE,
-      errMessage: meetingDetails.errMessage
-    });
+    return res.json({
+      result: RESPONSE.FAILURE,
+      errMessage: meetingDetails.errMessage
+    });
   } catch (err) {
     next(err);
   }
