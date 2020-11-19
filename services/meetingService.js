@@ -62,15 +62,13 @@ exports.getAllFilteredMeetings = async userId => {
     ]
   );
 
-  console.log('aggregate 결과..', result, typeof result);
-
   // 유저의 선호 조건에 맞는 사람들을 찾을 수 없었을 때
   if (!result.length) {
-    console.log('빈 배열 리턴!');
+
     return result; // 빈 배열 리턴
   }
 
-  const [ { creators } ] = result;
+  const [{ creators }] = result;
 
   const filteredCreators = [];
 
@@ -111,8 +109,6 @@ exports.getAllFilteredMeetings = async userId => {
         break;
     }
 
-    console.log(isMatchedGender, isMatchedOccupation, isMatchedBirthYear);
-
     if (
       isMatchedGender &&
       isMatchedOccupation &&
@@ -125,8 +121,6 @@ exports.getAllFilteredMeetings = async userId => {
       filteredCreators.push(creatorId);
     }
   }
-
-  console.log('선호 조건으로 필터링 된 유저 아이디..', filteredCreators);
 
   // 필터 된 아이디로 미팅 가져오기
   const filteredMeetings = [];
@@ -164,16 +158,12 @@ exports.getAllFilteredMeetings = async userId => {
     filteredMeetings.push(meeting[0]);
   }
 
-  console.log('필터링 된 미팅들!!', filteredMeetings);
-
   return filteredMeetings;
 };
 
 exports.getMeetingDetail = async (_id, userId) => {
   try {
     const meetingDetails = await Meeting.findOne({ _id });
-
-    console.log('미팅 디테일즈..', meetingDetails);
 
     // 유저가 보내온 미팅 아이디에 해당하는 미팅을 찾을 수 없을 때
     if (!meetingDetails) {
@@ -205,9 +195,7 @@ exports.getMeetingDetail = async (_id, userId) => {
 
     // 미팅 참여자가 1이 아니다 (2다) => 조인 이후 보낸 요청
     const partnerId = participant.find(obj => obj._id !== userId)._id;
-    console.log('파트너 아이디..', partnerId);
     const { nickname: partnerNickname } = await User.findOne({ _id: partnerId });
-    console.log('파트너 아이디로 가져온 파트너 닉네임..', partnerNickname);
     return {
       status: 'SUCCESS',
       data: {
@@ -238,20 +226,31 @@ exports.joinMeeting = async (meetingId, userId) => {
   }
 };
 
-exports.updateMeeting = async meetingId => {
+exports.deleteMeeting = async meetingId => {
   try {
-    return await Meeting.findOneAndUpdate(
-      { _id: meetingId },
-      { isMatched: true }
+    return await Meeting.findByIdAndRemove({ _id: meetingId });
+  } catch (err) {
+    return err;
+  }
+};
+
+exports.updateChat = async (meetingId, userId, message) => {
+  try {
+    await Meeting.findOneAndUpdate(
+      { '_id': meetingId },
+      { $push: { chat: { userId, message } } },
     );
   } catch (err) {
     return err;
   }
 };
 
-exports.deleteMeeting = async meetingId => {
+exports.getAllFilteredMessages = async meetingId => {
   try {
-    return await Meeting.deleteOne({ _id: meetingId });
+    const meeting = await Meeting.findOne({ _id: meetingId });
+    const { chat } = meeting.populate('chat');
+
+    return chat;
   } catch (err) {
     return err;
   }
