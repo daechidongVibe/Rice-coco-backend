@@ -118,28 +118,12 @@ exports.getAllFilteredMessages = async (req, res, next) => {
         result: RESPONSE.CAN_NOT_FIND
       });
     }
-    console.log('controllers', filteredMessages)
+
     res.status(200).json({
       result: RESPONSE.OK,
       filteredMessages,
     });
   }catch(err) {
-    next(err);
-  }
-};
-
-exports.deleteMeeting = async (req, res, next) => {
-  const { meetingId } = req.params;
-
-  try {
-    const result = await meetingService.deleteMeeting(meetingId);
-
-    console.log('삭제된 미팅 =>', result);
-
-    if (result) {
-      return res.json(result);
-    }
-  } catch (err) {
     next(err);
   }
 };

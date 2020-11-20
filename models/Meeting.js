@@ -17,7 +17,7 @@ const RestaurantSchema = new Schema({
 });
 
 const ChatSchema = new Schema({
-  author: { type: Schema.Types.ObjectId, ref: 'User' },
+  userId: { type: Schema.Types.ObjectId, ref: 'User' },
   message: { type: String, required: true },
 });
 
