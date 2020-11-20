@@ -19,8 +19,6 @@ const initSocket = server => {
   // memmo: message mock data update
   // createMessages.map(chat => meetingService.upDateChat(chat.meetingId, chat.author, chat.message));
   io.on('connection', socket => {
-    console.log(123);
-
     socket.on('join meeting', async data => {
       const { meetingId, userId } = data;
 
@@ -68,9 +66,11 @@ const initSocket = server => {
 
       try {
         socket.leave(meetingId);
+
         meetingService.deleteMeeting(meetingId);
 
         callback();
+
       } catch (err) {
         console.error(err);
       }
@@ -91,12 +91,31 @@ const initSocket = server => {
       );
 
       currentMeetingList.splice(endMeetingIndex, 1);
-
+      console.log('break meeting');
+      console.log(currentMeetingList);
+      socket.broadcast.to(meetingId).emit('meeting broked up');
       socket.leave(meetingId);
+    });
+
+    socket.on('leave meeting', meetingId => {
+      socket.leave(meetingId);
+
       socket.broadcast.to(meetingId).emit('meeting broke up');
       meetingService.deleteMeeting(meetingId);
-
+      
       callback();
+    });
+
+    socket.on('arrive meeting', meetingId => {
+      const currentMeeting = currentMeetingList.find(
+        meeting => meeting.meetingId === meetingId
+      );
+
+      currentMeeting.arrivalCount
+        ? currentMeeting.arrivalCount++
+        : (currentMeeting.arrivalCount = 1);
+
+      io.to(meetingId).emit('current meeting', currentMeeting);
     });
   });
 };
