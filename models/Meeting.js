@@ -29,12 +29,18 @@ const ParticipantSchema = new Schema({
 const MeetingSchema = new Schema(
   {
     restaurant: { type: RestaurantSchema, required: true },
-    expiredTime: { type: Date, default: new Date() + (60 * 60 * 1000) },
+    expiredTime: { type: Date },
     isMatched: { type: Boolean, default: false },
     participant: [{ type: ParticipantSchema, required: true }],
     chat: [{ type: ChatSchema }],
   },
   schemaOptions
 );
+
+MeetingSchema.pre('save', function(next) {
+  this.expiredTime = new Date(Date.now() +( 60 * 60 * 1000));
+  next();
+});
+
 
 module.exports = mongoose.model('Meeting', MeetingSchema);

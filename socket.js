@@ -6,8 +6,6 @@ const initSocket = server => {
   const io = socketIo(server);
 
   io.on('connection', socket => {
-    console.log(123);
-
     socket.on('join meeting', async data => {
       const { meetingId, userId } = data;
 
@@ -55,9 +53,11 @@ const initSocket = server => {
 
       try {
         socket.leave(meetingId);
-        meetingService.deleteMeeting(meetingId);
+
+        await meetingService.deleteMeeting(meetingId);
 
         callback();
+
       } catch (err) {
         console.error(err);
       }
@@ -72,18 +72,38 @@ const initSocket = server => {
       socket.leave(meetingId);
     });
 
-    socket.on('breakup meeting', (meetingId, callback) => {
+    socket.on('breakup meeting', async (meetingId, callback) => {
       const endMeetingIndex = currentMeetingList.findIndex(
         meeting => meeting.meetingId === meetingId
       );
 
       currentMeetingList.splice(endMeetingIndex, 1);
 
-      socket.leave(meetingId);
+      await meetingService.deleteMeeting(meetingId);
       socket.broadcast.to(meetingId).emit('meeting broked up');
-      meetingService.deleteMeeting(meetingId);
+      socket.leave(meetingId);
 
       callback();
+    });
+
+    socket.on('leave meeting', async (meetingId, callback) => {
+      socket.leave(meetingId);
+
+      socket.broadcast.to(meetingId).emit('meeting broked up');
+      await meetingService.deleteMeeting(meetingId);
+      callback();
+    });
+
+    socket.on('arrive meeting', meetingId => {
+      const currentMeeting = currentMeetingList.find(
+        meeting => meeting.meetingId === meetingId
+      );
+
+      currentMeeting.arrivalCount
+        ? currentMeeting.arrivalCount++
+        : (currentMeeting.arrivalCount = 1);
+
+      io.to(meetingId).emit('current meeting', currentMeeting);
     });
   });
 };
