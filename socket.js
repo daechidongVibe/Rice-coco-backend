@@ -29,13 +29,11 @@ const initSocket = server => {
       io.to(meetingId).emit('current meeting', currentMeeting);
     });
 
-    socket.on('send message', async ({userId, message}, callback) => {
+    socket.on('send message', async ({userId, message}) => {
       await meetingService.updateChat(socket.meetingId, userId, message);
 
       socket.emit('message', { userId, message });
-      io.to(socket.meetingId).emit('message', { userId, message } );
-
-      callback();
+      io.broadcast.to(socket.meetingId).emit('message', { userId, message } );
     });
 
     socket.on('change location', async data => {
@@ -57,7 +55,6 @@ const initSocket = server => {
         await meetingService.deleteMeeting(meetingId);
 
         callback();
-
       } catch (err) {
         console.error(err);
       }
