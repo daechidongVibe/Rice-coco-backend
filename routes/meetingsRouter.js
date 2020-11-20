@@ -27,9 +27,4 @@ meetingsRouter.get(
   meetingsControllers.getAllFilteredMessages
 );
 
-meetingsRouter.delete(
-  ROUTES.MEETING_DETAIL,
-  meetingsControllers.deleteMeeting
-);
-
 module.exports = meetingsRouter;
