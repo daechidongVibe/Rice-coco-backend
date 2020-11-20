@@ -1,23 +1,10 @@
 const socketIo = require('socket.io');
 const meetingService = require('./services/meetingService');
 const currentMeetingList = [];
-// memo: message mock data
-const createMessages = [{
-  meetingId: '5fb6572e287d6b41df85f06b',
-  author: '5fb52701a8ecd7c4c36eb375',
-  message: '안녕하세요',
-
-},
-{
-  meetingId: '5fb6572e287d6b41df85f06b',
-  author: '5fb52702a8ecd7c4c36eb376',
-  message: '네 안녕하세요',
-}];
 
 const initSocket = server => {
   const io = socketIo(server);
-  // memmo: message mock data update
-  // createMessages.map(chat => meetingService.upDateChat(chat.meetingId, chat.author, chat.message));
+
   io.on('connection', socket => {
     socket.on('join meeting', async data => {
       const { meetingId, userId } = data;
@@ -67,7 +54,7 @@ const initSocket = server => {
       try {
         socket.leave(meetingId);
 
-        meetingService.deleteMeeting(meetingId);
+        await meetingService.deleteMeeting(meetingId);
 
         callback();
 
@@ -85,24 +72,25 @@ const initSocket = server => {
       socket.leave(meetingId);
     });
 
-    socket.on('breakup meeting', (meetingId, callback) => {
+    socket.on('breakup meeting', async (meetingId, callback) => {
       const endMeetingIndex = currentMeetingList.findIndex(
         meeting => meeting.meetingId === meetingId
       );
 
       currentMeetingList.splice(endMeetingIndex, 1);
-      console.log('break meeting');
-      console.log(currentMeetingList);
+
+      await meetingService.deleteMeeting(meetingId);
       socket.broadcast.to(meetingId).emit('meeting broked up');
       socket.leave(meetingId);
+
+      callback();
     });
 
-    socket.on('leave meeting', meetingId => {
+    socket.on('leave meeting', async (meetingId, callback) => {
       socket.leave(meetingId);
 
-      socket.broadcast.to(meetingId).emit('meeting broke up');
-      meetingService.deleteMeeting(meetingId);
-      
+      socket.broadcast.to(meetingId).emit('meeting broked up');
+      await meetingService.deleteMeeting(meetingId);
       callback();
     });
 
