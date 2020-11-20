@@ -15,7 +15,7 @@ const initSocket = server => {
 
       if (currentMeeting && !currentMeeting.users.includes(userId)) {
         currentMeeting.users.push(userId);
-      } else {
+      } else if (!currentMeeting) {
         currentMeetingList.push({ meetingId, users: [userId] });
       }
 
@@ -45,8 +45,6 @@ const initSocket = server => {
       } catch (err) {
         console.error(err);
       }
-
-      console.log(currentMeetingList);
     });
 
     socket.on('end meeting', meetingId => {
@@ -64,8 +62,6 @@ const initSocket = server => {
       );
 
       currentMeetingList.splice(endMeetingIndex, 1);
-      console.log('break meeting');
-      console.log(currentMeetingList);
       socket.broadcast.to(meetingId).emit('meeting broked up');
       socket.leave(meetingId);
     });
