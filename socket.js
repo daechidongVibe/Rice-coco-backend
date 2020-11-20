@@ -16,7 +16,7 @@ const initSocket = server => {
 
       if (currentMeeting && !currentMeeting.users.includes(userId)) {
         currentMeeting.users.push(userId);
-      } else {
+      } else if (!currentMeeting) {
         currentMeetingList.push({ meetingId, users: [userId] });
       }
 

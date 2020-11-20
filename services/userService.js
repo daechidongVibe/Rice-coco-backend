@@ -87,3 +87,27 @@ exports.updatePromise = async (userId, amount) => {
     next(err);
   }
 };
+
+exports.getPartnerIdByNickname = async partnerNickname => {
+  try {
+    const { _id: partnerId } = await User.findOne({ nickname: partnerNickname });
+
+    return partnerId;
+  } catch (err) {
+    return err;
+  }
+};
+
+exports.addFavoritePartners = async (userId, partnerId) => {
+  try {
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: userId },
+      { $push: { favoritePartners: partnerId } },
+    );
+
+    return updatedUser;
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
+}
