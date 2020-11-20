@@ -1,23 +1,10 @@
 const socketIo = require('socket.io');
 const meetingService = require('./services/meetingService');
 const currentMeetingList = [];
-// memo: message mock data
-const createMessages = [{
-  meetingId: '5fb6572e287d6b41df85f06b',
-  author: '5fb52701a8ecd7c4c36eb375',
-  message: '안녕하세요',
-
-},
-{
-  meetingId: '5fb6572e287d6b41df85f06b',
-  author: '5fb52702a8ecd7c4c36eb376',
-  message: '네 안녕하세요',
-}];
 
 const initSocket = server => {
   const io = socketIo(server);
-  // memmo: message mock data update
-  // createMessages.map(chat => meetingService.upDateChat(chat.meetingId, chat.author, chat.message));
+
   io.on('connection', socket => {
     console.log(123);
 
@@ -93,7 +80,7 @@ const initSocket = server => {
       currentMeetingList.splice(endMeetingIndex, 1);
 
       socket.leave(meetingId);
-      socket.broadcast.to(meetingId).emit('meeting broke up');
+      socket.broadcast.to(meetingId).emit('meeting broked up');
       meetingService.deleteMeeting(meetingId);
 
       callback();
