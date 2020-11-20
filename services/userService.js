@@ -64,6 +64,7 @@ exports.updatePreferPartner = async (userId, preferredPartner) => {
     const updatedUser = await User.findOneAndUpdate(
       { _id: userId },
       { preferredPartner },
+      { new: true }
     );
 
     return updatedUser;
