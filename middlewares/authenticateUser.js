@@ -10,7 +10,15 @@ const authenticateUser = async (req, res, next) => {
     return next();
   }
 
-  const token = req.get('authorization');
+  let token;
+
+  if (req.path === '/payment') {
+    const { authToken } = req.query;
+
+    token = authToken;
+  } else {
+    token = req.get('authorization');
+  }
 
   try {
     const userInfo = jwt.verify(token, process.env.JWT_SECRET);

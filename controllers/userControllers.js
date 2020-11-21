@@ -76,10 +76,28 @@ exports.signup = async (req, res, next) => {
 };
 
 exports.updateUserInfo = async (req, res, next) => {
-  const { userId } = res.params;
+  const { userId } = req.params;
 
   try {
-    const result = await userService.updateUserInfo(userId);
+    const {
+      result,
+      updatedUser,
+      errMessage
+    } = await userService.updateUserInfo(userId, req.body);
+    console.log(result, updatedUser, errMessage);
+    if (result === 'SUCCESS') {
+      return res.json({
+        status: RESPONSE.OK,
+        updatedUser
+      });
+    }
+
+    if (result === 'FAILURE') {
+      return res.json({
+        status: RESPONSE.FAILURE,
+        errMessage
+      });
+    }
   } catch (err) {
     next(err);
   }
