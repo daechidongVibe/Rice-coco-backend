@@ -4,6 +4,16 @@ const meetingService = require('../services/meetingService');
 const RESPONSE = require('../constants/response');
 const User = require('../models/User');
 
+exports.getUserInfo = async (req, res, next) => {
+  const { userId } = req.params;
+  try {
+    const result = await userService.getUserInfo(userId);
+    return res.json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.login = async (req, res, next) => {
   const token = req.get('authorization');
 
