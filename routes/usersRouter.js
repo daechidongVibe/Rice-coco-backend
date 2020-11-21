@@ -3,6 +3,8 @@ const usersRouter = express.Router();
 const userControllers = require('../controllers/userControllers');
 const ROUTES = require('../constants/routes');
 
+usersRouter.get(ROUTES.USER_DETAIL, userControllers.getUserInfo);
+
 usersRouter.post(ROUTES.LOGIN, userControllers.login);
 
 usersRouter.post(ROUTES.SIGNUP, userControllers.signup);

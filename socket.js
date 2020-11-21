@@ -25,17 +25,18 @@ const initSocket = server => {
       if (currentMeeting && currentMeeting.users.length === 2) {
         await meetingService.joinMeeting(meetingId, userId);
       }
+
       socket.meetingId = meetingId;
       socket.join(meetingId);
 
       io.to(meetingId).emit('current meeting', currentMeeting);
     });
 
-    socket.on('send message', async ({ userId, message }) => {
-      await meetingService.updateChat(socket.meetingId, userId, message);
+    socket.on('send message', async ({userId, nickname, message}, callback) => {
+      await meetingService.updateChat(socket.meetingId, userId, nickname, message);
+      io.emit('message', { userId, nickname, message });
 
-      socket.emit('message', { userId, message });
-      io.broadcast.to(socket.meetingId).emit('message', { userId, message });
+      callback();
     });
 
     socket.on('change location', async data => {
@@ -106,10 +107,13 @@ const initSocket = server => {
         meeting => meeting.meetingId === meetingId
       );
 
+
       currentMeeting.arrivalCount
         ? currentMeeting.arrivalCount++
         : (currentMeeting.arrivalCount = 1);
 
+
+      console.log(currentMeeting);
       io.to(meetingId).emit('current meeting', currentMeeting);
     });
   });

@@ -194,8 +194,9 @@ exports.getMeetingDetail = async (_id, userId) => {
     }
 
     // 미팅 참여자가 1이 아니다 (2다) => 조인 이후 보낸 요청
-    const partnerId = participant.find(obj => obj._id !== userId)._id;
+    const partnerId = participant.find(obj => obj._id.toString() !== userId)._id;
     const { nickname: partnerNickname } = await User.findOne({ _id: partnerId });
+
     return {
       status: 'SUCCESS',
       data: {
@@ -219,7 +220,7 @@ exports.joinMeeting = async (meetingId, userId) => {
         $addToSet: { participant: { _id: userId } },
         $set: {
           isMatched: true,
-          expiredTime: new Date(Date.now() +(60 * 1000))
+          expiredTime: new Date(Date.now() +(15 * 1000))
         }
       },
       { new: true }
@@ -237,11 +238,11 @@ exports.deleteMeeting = async meetingId => {
   }
 };
 
-exports.updateChat = async (meetingId, userId, message) => {
+exports.updateChat = async (meetingId, userId, nickname, message) => {
   try {
     await Meeting.findOneAndUpdate(
       { '_id': meetingId },
-      { $push: { chat: { userId, message } } },
+      { $push: { chat: { userId, nickname, message } } },
     );
   } catch (err) {
     return err;

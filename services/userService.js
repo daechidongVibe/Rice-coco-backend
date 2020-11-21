@@ -1,5 +1,13 @@
 const User = require('../models/User');
 
+exports.getUserInfo = async (userId) => {
+  try {
+    return await User.findById(userId);
+  } catch (err) {
+    return err;
+  }
+};
+
 exports.login = async email => {
   try {
     return await User.findOne(
