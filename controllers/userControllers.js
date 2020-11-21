@@ -159,9 +159,11 @@ exports.updatePromise = async (req, res, next) => {
 };
 
 exports.addFavoritePartners = async (req, res, next) => {
+  const { userId } = req.params;
   const { partnerNickname } = req.body;
-  const { userId } = res.locals;
 
+  console.log(`partnerNickname : ${partnerNickname}`);
+  console.log(`userId : ${userId}`);
   try {
     const partnerId = await userService.getPartnerIdByNickname(partnerNickname);
     const updatedUser = await userService.addFavoritePartners(userId, partnerId);

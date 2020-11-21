@@ -12,12 +12,14 @@ const initSocket = server => {
       const meetingIndex = currentMeetingList.findIndex(
         meeting => meeting.meetingId === meetingId
       );
-      const currentMeeting = currentMeetingList[meetingIndex];
+
+      let currentMeeting = currentMeetingList[meetingIndex];
 
       if (currentMeeting && !currentMeeting.users.includes(userId)) {
         currentMeeting.users.push(userId);
       } else if (!currentMeeting) {
-        currentMeetingList.push({ meetingId, users: [userId] });
+        currentMeeting = { meetingId, users: [userId] };
+        currentMeetingList.push(currentMeeting);
       }
 
       if (currentMeeting && currentMeeting.users.length === 2) {
@@ -29,13 +31,11 @@ const initSocket = server => {
       io.to(meetingId).emit('current meeting', currentMeeting);
     });
 
-    socket.on('send message', async ({userId, message}, callback) => {
+    socket.on('send message', async ({ userId, message }) => {
       await meetingService.updateChat(socket.meetingId, userId, message);
 
       socket.emit('message', { userId, message });
-      io.to(socket.meetingId).emit('message', { userId, message } );
-
-      callback();
+      io.broadcast.to(socket.meetingId).emit('message', { userId, message });
     });
 
     socket.on('change location', async data => {
@@ -57,19 +57,26 @@ const initSocket = server => {
         await meetingService.deleteMeeting(meetingId);
 
         callback();
-
       } catch (err) {
         console.error(err);
       }
     });
 
-    socket.on('end meeting', meetingId => {
+    socket.on('end meeting', async (meetingId, callback) => {
       const endMeetingIndex = currentMeetingList.findIndex(
         meeting => meeting.meetingId === meetingId
       );
 
       currentMeetingList.splice(endMeetingIndex, 1);
-      socket.leave(meetingId);
+
+      try {
+        await meetingService.deleteMeeting(meetingId);
+        socket.leave(meetingId);
+
+        callback();
+      } catch (err) {
+        console.error(err);
+      }
     });
 
     socket.on('breakup meeting', async (meetingId, callback) => {
