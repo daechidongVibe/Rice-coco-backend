@@ -217,7 +217,7 @@ exports.joinMeeting = async (meetingId, userId) => {
       { _id: meetingId },
       {
         $addToSet: { participant: { _id: userId } },
-        $set: { isMatched: true }
+        $set: { isMatched: true, expiredTime: new Date(Date.now() + (60 * 1000)) }
       },
       { new: true }
     );
