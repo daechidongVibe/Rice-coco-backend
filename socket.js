@@ -16,7 +16,7 @@ const initSocket = server => {
 
       if (currentMeeting && !currentMeeting.users.includes(userId)) {
         currentMeeting.users.push(userId);
-      } else if (!currentMeeting) {
+      } else {
         currentMeetingList.push({ meetingId, users: [userId] });
       }
 
@@ -29,11 +29,11 @@ const initSocket = server => {
       io.to(meetingId).emit('current meeting', currentMeeting);
     });
 
-    socket.on('send message', async ({userId, message}) => {
-      await meetingService.updateChat(socket.meetingId, userId, message);
+    socket.on('send message', async ({userId, nickname, message}, callback) => {
+      await meetingService.updateChat(socket.meetingId, userId, nickname, message);
+      io.emit('message', { userId, nickname, message });
 
-      socket.emit('message', { userId, message });
-      io.broadcast.to(socket.meetingId).emit('message', { userId, message } );
+      callback();
     });
 
     socket.on('change location', async data => {

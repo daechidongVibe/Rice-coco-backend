@@ -234,11 +234,17 @@ exports.deleteMeeting = async meetingId => {
   }
 };
 
-exports.updateChat = async (meetingId, userId, message) => {
+exports.updateChat = async (
+  meetingId,
+  userId,
+  nickname,
+  message
+) => {
   try {
+
     await Meeting.findOneAndUpdate(
       { '_id': meetingId },
-      { $push: { chat: { userId, message } } },
+      { $push: { chat: { userId, nickname, message } } },
     );
   } catch (err) {
     return err;

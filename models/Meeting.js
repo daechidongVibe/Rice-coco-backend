@@ -18,6 +18,7 @@ const RestaurantSchema = new Schema({
 
 const ChatSchema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'User' },
+  nickname: {type: String, required: true},
   message: { type: String, required: true },
 });
 
