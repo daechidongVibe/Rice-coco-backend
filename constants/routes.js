@@ -13,5 +13,5 @@ module.exports = {
   JOIN: '/join',
   HISTORY: '/history',
   PROMISE: '/promise',
-  PAYMENT: '/PAYMENT',
+  PAYMENT: '/payment',
 };
