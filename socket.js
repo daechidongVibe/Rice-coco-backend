@@ -38,6 +38,9 @@ const initSocket = server => {
 
       callback();
     });
+    socket.on('send notification', async ({nickname, message}) => {
+      socket.broadcast.to(socket.meetingId).emit('notification recived', { nickname, message });
+    });
 
     socket.on('change location', async data => {
       const { location, meetingId } = data;
@@ -107,13 +110,10 @@ const initSocket = server => {
         meeting => meeting.meetingId === meetingId
       );
 
-
       currentMeeting.arrivalCount
         ? currentMeeting.arrivalCount++
         : (currentMeeting.arrivalCount = 1);
 
-
-      console.log(currentMeeting);
       io.to(meetingId).emit('current meeting', currentMeeting);
     });
   });

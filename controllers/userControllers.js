@@ -94,7 +94,6 @@ exports.updateUserInfo = async (req, res, next) => {
       updatedUser,
       errMessage
     } = await userService.updateUserInfo(userId, req.body);
-    console.log(result, updatedUser, errMessage);
     if (result === 'SUCCESS') {
       return res.json({
         status: RESPONSE.OK,
@@ -172,8 +171,6 @@ exports.addFavoritePartners = async (req, res, next) => {
   const { userId } = req.params;
   const { partnerNickname } = req.body;
 
-  console.log(`partnerNickname : ${partnerNickname}`);
-  console.log(`userId : ${userId}`);
   try {
     const partnerId = await userService.getPartnerIdByNickname(partnerNickname);
     const updatedUser = await userService.addFavoritePartners(userId, partnerId);
