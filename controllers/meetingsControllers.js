@@ -1,8 +1,7 @@
 const meetingService = require('../services/meetingService');
-const Meeting = require('../models/Meeting');
 const RESPONSE = require('../constants/response');
-const mongoose = require('mongoose');
-const ObjectId = mongoose.Types.ObjectId;
+
+
 
 exports.createMeeting = async (req, res, next) => {
   try {
@@ -69,18 +68,19 @@ exports.getMeetingDetail = async (req, res, next) => {
   }
   };
 
-exports.getMeetingByUserId = async (req, res, next) => {
+exports.getActiveMeetingByUserId = async (req, res, next) => {
   const { userId } = req.params;
 
   try {
-    const userMeeting = await Meeting.findOne({ "participant._id": new ObjectId(userId.toString()) });
+    const activeMeeting = await meetingService.getActiveMeetingByUserId(userId);
 
     res.json({
       result: RESPONSE.OK,
-      userMeeting
+      activeMeeting
     });
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    console.error(error);
+    next(error);
   }
 };
 
@@ -101,8 +101,8 @@ exports.joinMeeting = async (req, res, next) => {
     res.status(200).json({
       result: RESPONSE.CAN_NOT_UPDATE
     });
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -114,7 +114,8 @@ exports.getAllFilteredMessages = async (req, res, next) => {
 
     if(!filteredMessages) {
       return res.status(200).json({
-        result: RESPONSE.CAN_NOT_FIND
+        result: RESPONSE.CAN_NOT_FIND,
+
       });
     }
 
@@ -122,7 +123,7 @@ exports.getAllFilteredMessages = async (req, res, next) => {
       result: RESPONSE.OK,
       filteredMessages,
     });
-  }catch(err) {
-    next(err);
+  } catch(error) {
+    next(error);
   }
 };

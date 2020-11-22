@@ -1,120 +1,125 @@
 const socketIo = require('socket.io');
 const meetingService = require('./services/meetingService');
-const currentMeetingList = [];
+
+const currentMeetingList = {};
 
 const initSocket = server => {
   const io = socketIo(server);
 
   io.on('connection', socket => {
-    socket.on('join meeting', async data => {
-      const { meetingId, userId } = data;
-
-      const meetingIndex = currentMeetingList.findIndex(
-        meeting => meeting.meetingId === meetingId
-      );
-
-      let currentMeeting = currentMeetingList[meetingIndex];
+    socket.on('join meeting', async ({ meetingId, userId }) => {
+      let currentMeeting = currentMeetingList[meetingId];
 
       if (currentMeeting && !currentMeeting.users.includes(userId)) {
         currentMeeting.users.push(userId);
-      } else if (!currentMeeting) {
-        currentMeeting = { meetingId, users: [userId] };
-        currentMeetingList.push(currentMeeting);
       }
 
-      if (currentMeeting && currentMeeting.users.length === 2) {
-        await meetingService.joinMeeting(meetingId, userId);
+      if (!currentMeeting) {
+        currentMeeting = {
+          meetingId,
+          users: [userId],
+          arrivalCount: 0,
+        };
+
+        currentMeetingList[meetingId] = currentMeeting;
+      }
+
+      const isMeetingMatched = currentMeeting && currentMeeting.users.length === 2;
+
+      if (isMeetingMatched) {
+        try {
+          await meetingService.joinMeeting(meetingId, userId);
+        } catch (error) {
+          console.error(error);
+        }
       }
 
       socket.meetingId = meetingId;
       socket.join(meetingId);
+      console.log(currentMeeting);
 
-      io.to(meetingId).emit('current meeting', currentMeeting);
+      io.to(meetingId).emit('change current meeting', currentMeeting);
     });
 
-    socket.on('send message', async ({userId, nickname, message}, callback) => {
-      await meetingService.updateChat(socket.meetingId, userId, nickname, message);
-      io.emit('message', { userId, nickname, message });
+    socket.on('send message', async ({ userId, nickname, message }, callback) => {
+        await meetingService.updateChat(
+          socket.meetingId,
+          userId,
+          nickname,
+          message
+        );
 
-      callback();
-    });
-    socket.on('send notification', async ({nickname, message}) => {
-      socket.broadcast.to(socket.meetingId).emit('notification recived', { nickname, message });
-    });
-
-    socket.on('change location', async data => {
-      const { location, meetingId } = data;
-
-      socket.broadcast.to(meetingId).emit('partner location changed', location);
-    });
-
-    socket.on('cancel meeting', async (meetingId, callback) => {
-      const endMeetingIndex = currentMeetingList.findIndex(
-        meeting => meeting.meetingId === meetingId
-      );
-
-      currentMeetingList.splice(endMeetingIndex, 1);
-
-      try {
-        socket.leave(meetingId);
-
-        await meetingService.deleteMeeting(meetingId);
-
+        io.emit('message', { userId, nickname, message });
         callback();
-      } catch (err) {
-        console.error(err);
       }
+    );
+
+    socket.on('send notification', async ({ nickname, message }) => {
+      socket.broadcast
+        .to(socket.meetingId)
+        .emit('notification recived', { nickname, message });
     });
 
-    socket.on('end meeting', async (meetingId, callback) => {
-      const endMeetingIndex = currentMeetingList.findIndex(
-        meeting => meeting.meetingId === meetingId
-      );
+    socket.on('send location', async ({ location }) => {
+      socket.broadcast
+        .to(socket.meetingId)
+        .emit('get partner location', location);
+    });
 
-      currentMeetingList.splice(endMeetingIndex, 1);
+    socket.on('cancel meeting', async callback => {
+      const { meetingId } = socket;
 
       try {
         await meetingService.deleteMeeting(meetingId);
-        socket.leave(meetingId);
+        delete currentMeetingList[meetingId];
 
+        socket.leave(meetingId);
         callback();
-      } catch (err) {
-        console.error(err);
+      } catch (error) {
+        console.error(error);
       }
     });
 
-    socket.on('breakup meeting', async (meetingId, callback) => {
-      const endMeetingIndex = currentMeetingList.findIndex(
-        meeting => meeting.meetingId === meetingId
-      );
+    socket.on('finish meeting', async callback => {
+      const { meetingId } = socket;
+      delete currentMeetingList[meetingId];
 
-      currentMeetingList.splice(endMeetingIndex, 1);
+      try {
+        await meetingService.finishMeeting(meetingId);
+        delete currentMeetingList[meetingId];
 
-      await meetingService.deleteMeeting(meetingId);
-      socket.broadcast.to(meetingId).emit('meeting broked up');
+        socket.leave(meetingId);
+        callback();
+      } catch (error) {
+        console.error(error);
+      }
+
       socket.leave(meetingId);
-
       callback();
     });
 
-    socket.on('leave meeting', async (meetingId, callback) => {
-      socket.leave(meetingId);
+    socket.on('breakup meeting', async callback => {
+      const { meetingId } = socket;
 
-      socket.broadcast.to(meetingId).emit('meeting broked up');
-      await meetingService.deleteMeeting(meetingId);
-      callback();
+      try {
+        await meetingService.deleteMeeting(meetingId);
+        delete currentMeetingList[meetingId];
+
+        socket.broadcast.to(meetingId).emit('canceled by partner');
+        socket.leave(meetingId);
+        callback();
+      } catch (error) {
+        console.error(error);
+      }
     });
 
-    socket.on('arrive meeting', meetingId => {
-      const currentMeeting = currentMeetingList.find(
-        meeting => meeting.meetingId === meetingId
-      );
+    socket.on('arrive meeting', () => {
+      const { meetingId } = socket;
+      const currentMeeting = currentMeetingList[meetingId];
 
-      currentMeeting.arrivalCount
-        ? currentMeeting.arrivalCount++
-        : (currentMeeting.arrivalCount = 1);
+      currentMeeting.arrivalCount++;
 
-      io.to(meetingId).emit('current meeting', currentMeeting);
+      io.to(meetingId).emit('change current meeting', currentMeeting);
     });
   });
 };

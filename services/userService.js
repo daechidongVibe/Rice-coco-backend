@@ -108,7 +108,7 @@ exports.addFavoritePartners = async (userId, partnerId) => {
   try {
     const updatedUser = await User.findOneAndUpdate(
       { _id: userId },
-      { $push: { favoritePartners: partnerId } },
+      { $addToSet: { favoritePartners: partnerId } },
     );
 
     return updatedUser;

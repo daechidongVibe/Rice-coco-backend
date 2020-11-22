@@ -24,7 +24,6 @@ const ChatSchema = new Schema({
 
 const ParticipantSchema = new Schema({
   _id: { type: Schema.Types.ObjectId, ref: 'User' },
-  isArrived: { type: Boolean, default: false },
 });
 
 const MeetingSchema = new Schema(
@@ -32,6 +31,7 @@ const MeetingSchema = new Schema(
     restaurant: { type: RestaurantSchema, required: true },
     expiredTime: { type: Date },
     isMatched: { type: Boolean, default: false },
+    isFinished: { type: Boolean, default: false },
     participant: [{ type: ParticipantSchema, required: true }],
     chat: [{ type: ChatSchema }],
   },
