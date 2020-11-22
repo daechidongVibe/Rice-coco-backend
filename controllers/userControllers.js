@@ -4,6 +4,16 @@ const meetingService = require('../services/meetingService');
 const RESPONSE = require('../constants/response');
 const User = require('../models/User');
 
+exports.getUserInfo = async (req, res, next) => {
+  const { userId } = req.params;
+  try {
+    const result = await userService.getUserInfo(userId);
+    return res.json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.login = async (req, res, next) => {
   const token = req.get('authorization');
 
@@ -76,10 +86,27 @@ exports.signup = async (req, res, next) => {
 };
 
 exports.updateUserInfo = async (req, res, next) => {
-  const { userId } = res.params;
+  const { userId } = req.params;
 
   try {
-    const result = await userService.updateUserInfo(userId);
+    const {
+      result,
+      updatedUser,
+      errMessage
+    } = await userService.updateUserInfo(userId, req.body);
+    if (result === 'SUCCESS') {
+      return res.json({
+        status: RESPONSE.OK,
+        updatedUser
+      });
+    }
+
+    if (result === 'FAILURE') {
+      return res.json({
+        status: RESPONSE.FAILURE,
+        errMessage
+      });
+    }
   } catch (err) {
     next(err);
   }
@@ -141,8 +168,8 @@ exports.updatePromise = async (req, res, next) => {
 };
 
 exports.addFavoritePartners = async (req, res, next) => {
+  const { userId } = req.params;
   const { partnerNickname } = req.body;
-  const { userId } = res.locals;
 
   try {
     const partnerId = await userService.getPartnerIdByNickname(partnerNickname);

@@ -12,17 +12,20 @@ const initSocket = server => {
       const meetingIndex = currentMeetingList.findIndex(
         meeting => meeting.meetingId === meetingId
       );
-      const currentMeeting = currentMeetingList[meetingIndex];
+
+      let currentMeeting = currentMeetingList[meetingIndex];
 
       if (currentMeeting && !currentMeeting.users.includes(userId)) {
         currentMeeting.users.push(userId);
-      } else {
-        currentMeetingList.push({ meetingId, users: [userId] });
+      } else if (!currentMeeting) {
+        currentMeeting = { meetingId, users: [userId] };
+        currentMeetingList.push(currentMeeting);
       }
 
       if (currentMeeting && currentMeeting.users.length === 2) {
         await meetingService.joinMeeting(meetingId, userId);
       }
+
       socket.meetingId = meetingId;
       socket.join(meetingId);
 
@@ -35,7 +38,6 @@ const initSocket = server => {
 
       callback();
     });
-
     socket.on('send notification', async ({nickname, message}) => {
       socket.broadcast.to(socket.meetingId).emit('notification recived', { nickname, message });
     });
@@ -64,13 +66,21 @@ const initSocket = server => {
       }
     });
 
-    socket.on('end meeting', meetingId => {
+    socket.on('end meeting', async (meetingId, callback) => {
       const endMeetingIndex = currentMeetingList.findIndex(
         meeting => meeting.meetingId === meetingId
       );
 
       currentMeetingList.splice(endMeetingIndex, 1);
-      socket.leave(meetingId);
+
+      try {
+        await meetingService.deleteMeeting(meetingId);
+        socket.leave(meetingId);
+
+        callback();
+      } catch (err) {
+        console.error(err);
+      }
     });
 
     socket.on('breakup meeting', async (meetingId, callback) => {

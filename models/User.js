@@ -27,7 +27,7 @@ const UserSchema = new Schema(
     favoritePartners: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     history: [{ type: Schema.Types.ObjectId, ref: 'Meeting' }],
     promise: { type: Number, default: 5 },
-    payment: { type: Schema.Types.ObjectId, ref: 'Payment' },
+    payment: [{ type: Schema.Types.ObjectId, ref: 'Payment' }],
     location: { type: LocationSchema },
   },
   schemaOptions

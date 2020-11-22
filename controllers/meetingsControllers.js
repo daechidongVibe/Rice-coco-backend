@@ -41,7 +41,6 @@ exports.getAllFilteredMeetings = async (req, res, next) => {
       filteredMeetings: result
     });
   } catch (err) {
-    console.log(err);
     next(err);
   }
 };

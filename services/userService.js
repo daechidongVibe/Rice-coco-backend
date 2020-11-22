@@ -1,5 +1,13 @@
 const User = require('../models/User');
 
+exports.getUserInfo = async (userId) => {
+  try {
+    return await User.findById(userId);
+  } catch (err) {
+    return err;
+  }
+};
+
 exports.login = async email => {
   try {
     return await User.findOne(
@@ -45,15 +53,32 @@ exports.signup = async userInfo => {
   }
 };
 
-exports.updateUserInfo = async (userId) => {
+exports.updateUserInfo = async (userId, userInfo) => {
+  const { nickname, occupation }  = userInfo;
+
   try {
     const updatedUser = await User.findOneAndUpdate(
       { _id: userId },
-      {  },
+      {
+        $set: {
+          nickname,
+          occupation
+        }
+      },
       { new: true }
     );
 
-    console.log('업데이트 된 유저! => ', updatedUser);
+    if (updatedUser) {
+      return {
+        result: 'SUCCESS',
+        updatedUser
+      };
+    }
+
+    return {
+      result: 'FAILURE',
+      errMessage: '유저가 없거나 업데이트에 실패하였습니다..'
+    };
   } catch (err) {
     return err;
   }
