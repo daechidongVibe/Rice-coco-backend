@@ -9,7 +9,10 @@ const PaymentSchema = new Schema(
   {
     buyer: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
     amount: { type: Number, required: true },
-    productInfo: { type: String, required: true },
+    productInfo: {
+      name: String,
+      amount: Number,
+    },
     isVerified: { type: Boolean, default: false }
   },
   schemaOptions

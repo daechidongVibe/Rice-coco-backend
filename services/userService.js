@@ -1,5 +1,14 @@
 const User = require('../models/User');
 
+exports.getUserInfo = async (userId) => {
+  try {
+    const user = await User.findById(userId);
+    return user;
+  } catch (err) {
+    return err;
+  }
+};
+
 exports.login = async email => {
   try {
     return await User.findOne(
@@ -20,25 +29,8 @@ exports.login = async email => {
 
 exports.signup = async userInfo => {
   try {
-    const {
-      _id,
-      nickname,
-      gender,
-      occupation,
-      birthYear,
-      email,
-      favoritePartners,
-    } = await User.create(userInfo);
-
-    return {
-      _id,
-      nickname,
-      gender,
-      occupation,
-      birthYear,
-      email,
-      favoritePartners,
-    };
+    const user = await User.create(userInfo);
+    return user;
   } catch (err) {
     console.error(err);
     next(err);
@@ -46,15 +38,12 @@ exports.signup = async userInfo => {
 };
 
 exports.updateUserInfo = async (userId, userInfo) => {
-  const { nickname, occupation }  = userInfo;
-
   try {
     const updatedUser = await User.findOneAndUpdate(
       { _id: userId },
       {
         $set: {
-          nickname,
-          occupation
+          ...userInfo
         }
       },
       { new: true }

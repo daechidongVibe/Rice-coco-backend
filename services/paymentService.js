@@ -1,4 +1,5 @@
 const Payment = require('../models/Payment');
+const User = require('../models/User');
 
 exports.createService = async (userId, amount, productInfo) => {
   const payment = await Payment.create({
@@ -7,6 +8,9 @@ exports.createService = async (userId, amount, productInfo) => {
     productInfo
   });
 
-  console.log('새롭게 만들어진 페이먼트..', payment);
-  return payment
+  await User.findByIdAndUpdate(
+    userId,
+    { $addToSet: { payment: payment._id } });
+
+  return payment;
 };

@@ -2,6 +2,7 @@ const axios = require('axios');
 
 const paymentService = require('../services/paymentService');
 const Payment = require('../models/Payment');
+const User = require('../models/User');
 
 exports.createPayment = async (req, res, next) => {
   try {
@@ -17,6 +18,8 @@ exports.createPayment = async (req, res, next) => {
 };
 
 exports.authenticatePayment = async (req, res, next) => {
+  const { userId } = res.locals.userInfo;
+
   // 웹뷰에서 결제시도 이후 해당 API로 리다이렉트
 
   // imp_success 로 결제 성공여부 판단
@@ -57,6 +60,7 @@ exports.authenticatePayment = async (req, res, next) => {
     // 3. RICE COCO DB에 저장되어 있는 주문 정보 조회
     const order = await Payment.findById(paymentData.merchant_uid);
     const amountToBePaid = order.amount;
+    const promiseToBeUpdate = order.productInfo.amount;
 
     // 4. 아임포트의 결제정보(paymentData)와 RICE COCO의 주문정보(order)의 결제 금액을 비교하고, 이상이 없다면 검증된 데이터를 RICE COCO 서버 DB에 저장
     const { amount, status } = paymentData;
@@ -76,13 +80,33 @@ exports.authenticatePayment = async (req, res, next) => {
         }
       );
 
+      // 유저 인포를 가져오고, 프로미스 수 업데이트
+      const updatedUserInfo = await User.findByIdAndUpdate(
+        userId,
+        { $inc: { promise: promiseToBeUpdate } },
+        { new: true }
+      );
+
+      console.log('유저 프로미스 잘 업데이트 되었는지 확인', updatedUserInfo);
+
+      const { nickname, promise } = updatedUserInfo;
+
       switch (status) {
         case 'ready':
           const { vbank_num, vbank_date, vbank_name } = paymentData;
-          res.send({ status: 'vbankIssued', message: '가상계좌 발급 성공' });
+          res.render('payment_result', {
+            status: 'vbankIssued',
+            message: '가상계좌 발급 성공'
+          });
           break;
         case 'paid':
-          res.send({ status: 'success', message: '일반 결제 성공' });
+          res.render('payment_result', {
+            status: 'success',
+            message: '일반 결제 성공',
+            nickname,
+            purchasedPromise: promiseToBeUpdate,
+            promise
+          });
           break;
       }
     } else {

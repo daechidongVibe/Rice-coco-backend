@@ -1,8 +1,18 @@
 const jwt = require('jsonwebtoken');
 const userService = require('../services/userService');
-const meetingService = require('../services/meetingService');
 const RESPONSE = require('../constants/response');
-const User = require('../models/User');
+
+exports.getUserInfo = async (req, res, next) => {
+  const { userId } = req.params;
+
+  try {
+    const result = await userService.getUserInfo(userId);
+
+    return res.json(result);
+  } catch (err) {
+    next(err);
+  }
+};
 
 exports.login = async (req, res, next) => {
   const token = req.get('authorization');
@@ -84,7 +94,7 @@ exports.updateUserInfo = async (req, res, next) => {
       updatedUser,
       errMessage
     } = await userService.updateUserInfo(userId, req.body);
-    console.log(result, updatedUser, errMessage);
+
     if (result === 'SUCCESS') {
       return res.json({
         status: RESPONSE.OK,
