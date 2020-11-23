@@ -6,7 +6,6 @@ const ROUTES = require('../constants/routes');
 usersRouter.get(ROUTES.USER_DETAIL, userControllers.getUserInfo);
 
 usersRouter.post(ROUTES.LOGIN, userControllers.login);
-
 usersRouter.post(ROUTES.SIGNUP, userControllers.signup);
 
 usersRouter.put(
@@ -16,7 +15,7 @@ usersRouter.put(
 
 usersRouter.put(
   ROUTES.USER_DETAIL + ROUTES.PREFERRED_PARTNER,
-  userControllers.updatePreferPartner
+  userControllers.updatePreferredPartner
 );
 
 usersRouter.put(

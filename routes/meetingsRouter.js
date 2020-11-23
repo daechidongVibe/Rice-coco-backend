@@ -14,7 +14,7 @@ meetingsRouter.get(
 
 meetingsRouter.get(
   '/user' + ROUTES.USER_DETAIL,
-  meetingsControllers.getMeetingByUserId
+  meetingsControllers.getActiveMeetingByUserId
 );
 
 meetingsRouter.put(

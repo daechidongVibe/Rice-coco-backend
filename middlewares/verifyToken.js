@@ -2,11 +2,11 @@ const jwt = require('jsonwebtoken');
 const RESPONSE = require('../constants/response');
 const ROUTES = require('../constants/routes');
 
-const authenticateUser = async (req, res, next) => {
+const verifyToken = async (req, res, next) => {
   if (
-    (req.path === ROUTES.USERS + ROUTES.LOGIN) ||
-    (req.path === ROUTES.USERS + ROUTES.SIGNUP)
-    ) {
+    req.path === `${ROUTES.USERS}${ROUTES.LOGIN}` ||
+    req.path === `${ROUTES.USERS}${ROUTES.SIGNUP}`
+  ) {
     return next();
   }
 
@@ -26,10 +26,8 @@ const authenticateUser = async (req, res, next) => {
 
     next();
   } catch (error) {
-    res.status(401).json(
-      { error: RESPONSE.UNAUTHORIZED }
-    );
+    res.status(401).json({ error: RESPONSE.UNAUTHORIZED });
   }
 };
 
-module.exports = authenticateUser;
+module.exports = verifyToken;
