@@ -22,127 +22,48 @@ exports.createMeeting = async (selectedMeeting, userId) => {
 };
 
 exports.getAllFilteredMeetings = async userId => {
-  const user = await User.findOne({ _id: userId });
+  const user = await User.findById(userId).lean();
+  const userConditions = user.preferredPartner;
 
-  if (!user) {
-    return {
-      error: '유저가 없습니다! 로그인은 제대로 되었나요?',
-    };
-  }
+  delete userConditions._id;
 
-  const { preferredPartner } = user;
-
-  const result = await Meeting.aggregate([
-    {
-      $match: {
-        $and: [{ isMatched: false }, { participant: { $size: 1 } }],
-      },
-    },
-    {
-      $unwind: '$participant',
-    },
-    {
-      $group: {
-        _id: '$_id',
-        participants: { $push: '$participant' },
-      },
-    },
-    {
-      $unwind: '$participants',
-    },
-    {
-      $group: {
-        _id: null,
-        creators: { $push: '$participants._id' },
-      },
-    },
-  ]);
-
-  // 유저의 선호 조건에 맞는 사람들을 찾을 수 없었을 때
-  if (!result.length) {
-    return result; // 빈 배열 리턴
-  }
-
-  const [{ creators }] = result;
-
-  const filteredCreators = [];
-
-  for (let creatorId of creators) {
-    let isMatchedPartner = false;
-
-    const creator = await User.findOne({ _id: creatorId }, { _id: 0 });
-
-    const { gender, birthYear, occupation } = creator;
-    const {
-      gender: preferredGender,
-      birthYear: preferredBirthYear,
-      occupation: preferredOccupation,
-    } = preferredPartner;
-
-    const isMatchedGender = gender === preferredGender ? true : false;
-    const isMatchedOccupation = occupation === preferredOccupation ? true : false;
-    let isMatchedBirthYear = false;
-
-    const currentYear = new Date().getFullYear();
-    const creatorAge = currentYear - parseInt(birthYear);
-
-    switch (preferredBirthYear) {
-      case '20대':
-        isMatchedBirthYear = creatorAge.toString()[0] === '2' ? true : false;
-        break;
-      case '30대':
-        isMatchedBirthYear = creatorAge.toString()[0] === '3' ? true : false;
-        break;
-      case '40대':
-        isMatchedBirthYear = creatorAge.toString()[0] === '4' ? true : false;
-        break;
-      case '50대':
-        isMatchedBirthYear = creatorAge.toString()[0] === '5' ? true : false;
-        break;
-    }
-
-    if (isMatchedGender && isMatchedOccupation && isMatchedBirthYear) {
-      isMatchedPartner = true;
-    }
-
-    if (isMatchedPartner) {
-      filteredCreators.push(creatorId);
-    }
-  }
-
-  // 필터 된 아이디로 미팅 가져오기
+  const { gender, occupation, birthYear } = user;
+  const userProfile = { gender, occupation, birthYear };
   const filteredMeetings = [];
 
-  // 해당 크리에이터들이 만든 미팅 정보 가져오기..
-  for (let creatorId of filteredCreators) {
-    const meeting = await Meeting.aggregate([
-      {
-        $match: {
-          participant: { $elemMatch: { _id: creatorId } },
-        },
-      },
-      { $unwind: '$participant' },
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'participant._id',
-          foreignField: '_id',
-          as: 'participant',
-        },
-      },
-      { $unwind: '$participant' },
-      {
-        $project: {
-          _id: 1,
-          restaurant: 1,
-          participant: '$participant.nickname',
-          expiredTime: 1,
-        },
-      },
-    ]);
+  const activeMeetings = await Meeting.find({ isMatched: false })
+    .populate('participant._id')
+    .lean();
 
-    filteredMeetings.push(meeting[0]);
+  if (!activeMeetings.length) return filteredMeetings;
+
+  for (let i = 0; i < activeMeetings.length; i++) {
+    const currentActiveMeeting = activeMeetings[i];
+    const waitingPartner = currentActiveMeeting.participant[0]._id;
+    const partnerNickname = waitingPartner.nickname;
+    const partnerConditions = waitingPartner.preferredPartner;
+
+    const { gender, occupation, birthYear } = waitingPartner;
+    const partnerProfile = { gender, occupation, birthYear };
+
+    delete partnerConditions._id;
+
+    for (const condition in partnerConditions) {
+      if (partnerConditions[condition] !== userProfile[condition]) continue;
+      if (partnerProfile[condition] !== userConditions[condition]) continue;
+    }
+
+    const { _id, restaurant, expiredTime } = currentActiveMeeting;
+
+    filteredMeetings.push({
+      meetingId: _id,
+      restaurant,
+      partnerNickname,
+      expiredTime,
+    });
   }
+
+  console.log(filteredMeetings);
 
   return filteredMeetings;
 };
@@ -172,7 +93,7 @@ exports.getMeetingDetail = async (meetingId, userId) => {
       restaurantId,
       restaurantLocation,
       restaurantName,
-    }
+    };
   } catch (error) {
     throw new Error(error);
   }

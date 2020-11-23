@@ -29,6 +29,8 @@ exports.getAllFilteredMeetings = async (req, res, next) => {
         result: RESPONSE.FAILURE,
         errMessage: result.error,
       });
+
+      return;
     }
 
     res.status(200).json({
