@@ -1,82 +1,67 @@
 const User = require('../models/User');
 
-exports.getUserInfo = async (userId) => {
+exports.getUserInfo = async userId => {
   try {
     const user = await User.findById(userId);
+
     return user;
-  } catch (err) {
-    return err;
+  } catch (error) {
+    throw new Error(error);
   }
 };
 
 exports.login = async email => {
   try {
-    return await User.findOne(
+    const user = await User.findOne(
       { email },
       {
-        history: 0,
-        location: 0,
         updated_at: 0,
         created_at: 0,
-        __v: 0
+        __v: 0,
       }
     );
-  } catch (err) {
-    console.error(err);
-    next(err);
+
+    return user;
+  } catch (error) {
+    throw new Error(error);
   }
 };
 
 exports.signup = async userInfo => {
   try {
     const user = await User.create(userInfo);
+
     return user;
-  } catch (err) {
-    console.error(err);
-    next(err);
+  } catch (error) {
+    throw new Error(error);
   }
 };
 
 exports.updateUserInfo = async (userId, userInfo) => {
   try {
-    const updatedUser = await User.findOneAndUpdate(
-      { _id: userId },
-      {
-        $set: {
-          ...userInfo
-        }
-      },
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: { ...userInfo } },
       { new: true }
     );
 
-    if (updatedUser) {
-      return {
-        result: 'SUCCESS',
-        updatedUser
-      };
-    }
-
-    return {
-      result: 'FAILURE',
-      errMessage: '유저가 없거나 업데이트에 실패하였습니다..'
-    };
-  } catch (err) {
-    return err;
+    return updatedUser;
+  } catch (error) {
+    throw new Error(error);
   }
 };
 
-exports.updatePreferPartner = async (userId, preferredPartner) => {
+exports.updatePreferredPartner = async (userId, preferredPartner) => {
   try {
-    const updatedUser = await User.findOneAndUpdate(
-      { _id: userId },
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
       { preferredPartner },
       { new: true }
     );
 
     return updatedUser;
-  } catch (err) {
-    console.error(err);
-    next(err);
+  } catch (error) {
+    throw new Error(error);
   }
 };
 
@@ -88,19 +73,20 @@ exports.updatePromise = async (userId, amount) => {
     );
 
     return updatedUser;
-  } catch (err) {
-    console.error(err);
-    next(err);
+  } catch (error) {
+    throw new Error(error);
   }
 };
 
 exports.getPartnerIdByNickname = async partnerNickname => {
   try {
-    const { _id: partnerId } = await User.findOne({ nickname: partnerNickname });
+    const { _id: partnerId } = await User.findOne({
+      nickname: partnerNickname,
+    });
 
     return partnerId;
-  } catch (err) {
-    return err;
+  } catch (error) {
+    throw new Error(error);
   }
 };
 
@@ -108,12 +94,11 @@ exports.addFavoritePartners = async (userId, partnerId) => {
   try {
     const updatedUser = await User.findOneAndUpdate(
       { _id: userId },
-      { $addToSet: { favoritePartners: partnerId } },
+      { $addToSet: { favoritePartners: partnerId } }
     );
 
     return updatedUser;
-  } catch (err) {
-    console.error(err);
-    next(err);
+  } catch (error) {
+    throw new Error(error);
   }
-}
+};

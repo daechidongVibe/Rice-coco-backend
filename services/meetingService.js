@@ -2,7 +2,7 @@ const Meeting = require('../models/Meeting');
 const User = require('../models/User');
 const mongoose = require('mongoose');
 
-exports.createMeeting = async ({ selectedMeeting, userId }) => {
+exports.createMeeting = async (selectedMeeting, userId) => {
   const { restaurantId, restaurantName, restaurantLocation } = selectedMeeting;
 
   try {
@@ -16,8 +16,8 @@ exports.createMeeting = async ({ selectedMeeting, userId }) => {
     });
 
     return createdMeeting;
-  } catch (err) {
-    return err;
+  } catch (error) {
+    throw new Error(error);
   }
 };
 
@@ -80,8 +80,7 @@ exports.getAllFilteredMeetings = async userId => {
     } = preferredPartner;
 
     const isMatchedGender = gender === preferredGender ? true : false;
-    const isMatchedOccupation =
-      occupation === preferredOccupation ? true : false;
+    const isMatchedOccupation = occupation === preferredOccupation ? true : false;
     let isMatchedBirthYear = false;
 
     const currentYear = new Date().getFullYear();
@@ -148,56 +147,33 @@ exports.getAllFilteredMeetings = async userId => {
   return filteredMeetings;
 };
 
-exports.getMeetingDetail = async (_id, userId) => {
+exports.getMeetingDetail = async (meetingId, userId) => {
   try {
-    const meetingDetails = await Meeting.findOne({ _id });
-
-    // 유저가 보내온 미팅 아이디에 해당하는 미팅을 찾을 수 없을 때
-    if (!meetingDetails) {
-      return {
-        status: 'FAILURE',
-        errMessage: '해당 미팅 정보를 찾을 수 없습니다',
-      };
-    }
-
-    // 미팅이 있다면 까준다(?)
+    const meetingDetails = await Meeting.findById(meetingId);
     const { expiredTime, restaurant, participant } = meetingDetails;
-
     const {
       restaurantId,
       location: restaurantLocation,
       name: restaurantName,
     } = restaurant;
 
-    // 미팅 참여자가 1 => 크리에이트 이후 보낸 요청
-    if (meetingDetails.participant.length === 1) {
-      return {
-        status: 'SUCCESS',
-        data: {
-          restaurantName,
-          expiredTime,
-        },
-      };
+    const partner = participant.find(obj => obj._id.toString() !== userId);
+    const partnerId = partner && partner._id;
+    let partnerNickname;
+
+    if (partnerId) {
+      const { nickname } = await User.findById(partnerId);
+      partnerNickname = nickname;
     }
 
-    // 미팅 참여자가 1이 아니다 (2다) => 조인 이후 보낸 요청
-    const partnerId = participant.find(obj => obj._id.toString() !== userId)
-      ._id;
-    const { nickname: partnerNickname } = await User.findOne({
-      _id: partnerId,
-    });
-
     return {
-      status: 'SUCCESS',
-      data: {
-        expiredTime,
-        partnerNickname,
-        restaurantId,
-        restaurantLocation,
-        restaurantName,
-      },
-    };
-  } catch (err) {
+      expiredTime,
+      partnerNickname,
+      restaurantId,
+      restaurantLocation,
+      restaurantName,
+    }
+  } catch (error) {
     throw new Error(error);
   }
 };
@@ -208,7 +184,7 @@ exports.getActiveMeetingByUserId = async userId => {
   try {
     const activeMeeting = await Meeting.findOne({
       participant: { $elemMatch: { _id: mongooseUserId } },
-      isFinish: false,
+      isFinished: false,
     });
 
     return activeMeeting;
@@ -219,8 +195,8 @@ exports.getActiveMeetingByUserId = async userId => {
 
 exports.joinMeeting = async (meetingId, userId) => {
   try {
-    return await Meeting.findOneAndUpdate(
-      { _id: meetingId },
+    const updatedMeeting = await Meeting.findByIdAndUpdate(
+      meetingId,
       {
         $addToSet: { participant: { _id: userId } },
         $set: {
@@ -230,7 +206,9 @@ exports.joinMeeting = async (meetingId, userId) => {
       },
       { new: true }
     );
-  } catch (err) {
+
+    return updatedMeeting;
+  } catch (error) {
     throw new Error(error);
   }
 };

@@ -39,7 +39,7 @@ const MeetingSchema = new Schema(
 );
 
 MeetingSchema.pre('save', function(next) {
-  this.expiredTime = new Date(Date.now() +( 15 * 1000 ));
+  this.expiredTime = new Date(Date.now() +( 60 * 1000 ));
   next();
 });
 

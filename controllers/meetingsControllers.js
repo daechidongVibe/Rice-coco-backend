@@ -1,24 +1,20 @@
 const meetingService = require('../services/meetingService');
 const RESPONSE = require('../constants/response');
 
-
-
 exports.createMeeting = async (req, res, next) => {
+  const { selectedMeeting, userId } = req.body;
+  console.log(selectedMeeting);
+
   try {
-    const createdMeeting = await meetingService.createMeeting(req.body);
-    if (createdMeeting) {
-      return res.json({
-        result: RESPONSE.OK,
-        createdMeeting
-      });
-    } else {
-      return res.json({
-        result: RESPONSE.FAILURE,
-        errMessage: RESPONSE.DID_NOT_CREATED
-      });
-    }
-  } catch (err) {
-    next(err);
+    const createdMeeting = await meetingService.createMeeting(
+      selectedMeeting,
+      userId
+    );
+
+    res.status(201).json({ result: RESPONSE.OK, createdMeeting });
+  } catch (error) {
+    console.warn(error);
+    next(error);
   }
 };
 
@@ -31,16 +27,17 @@ exports.getAllFilteredMeetings = async (req, res, next) => {
     if (result.error) {
       res.status(500).json({
         result: RESPONSE.FAILURE,
-        errMessage: result.error
-      })
+        errMessage: result.error,
+      });
     }
 
     res.status(200).json({
       result: RESPONSE.OK,
-      filteredMeetings: result
+      filteredMeetings: result,
     });
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    console.warn(error);
+    next(error);
   }
 };
 
@@ -49,24 +46,17 @@ exports.getMeetingDetail = async (req, res, next) => {
   const { userId } = res.locals.userInfo;
 
   try {
-    const meetingDetails = await meetingService.getMeetingDetail(meetingId, userId);
+    const meetingDetails = await meetingService.getMeetingDetail(
+      meetingId,
+      userId
+    );
 
-    if (meetingDetails.status === 'SUCCESS') {
-      return res.status(201).json({
-          result: RESPONSE.OK,
-          meetingDetails: meetingDetails.data
-        }
-      );
-    }
-
-    return res.json({
-      result: RESPONSE.FAILURE,
-      errMessage: meetingDetails.errMessage
-    });
-  } catch (err) {
-    next(err);
+    res.status(200).json({ result: RESPONSE.OK, meetingDetails });
+  } catch (error) {
+    console.warn(error);
+    next(error);
   }
-  };
+};
 
 exports.getActiveMeetingByUserId = async (req, res, next) => {
   const { userId } = req.params;
@@ -76,7 +66,7 @@ exports.getActiveMeetingByUserId = async (req, res, next) => {
 
     res.json({
       result: RESPONSE.OK,
-      activeMeeting
+      activeMeeting,
     });
   } catch (error) {
     console.error(error);
@@ -91,17 +81,15 @@ exports.joinMeeting = async (req, res, next) => {
   try {
     const updatedMeeting = await meetingService.joinMeeting(meetingId, userId);
 
-    if (updatedMeeting) {
-      return res.status(200).json({
-        result: RESPONSE.OK,
-        updatedMeeting
-      });
+    if (!updatedMeeting) {
+      res.status(200).json({ result: RESPONSE.MEETING_IS_GONE });
+
+      return;
     }
 
-    res.status(200).json({
-      result: RESPONSE.CAN_NOT_UPDATE
-    });
+    res.status(200).json({ result: RESPONSE.OK, updatedMeeting });
   } catch (error) {
+    console.error(error);
     next(error);
   }
 };
@@ -110,12 +98,13 @@ exports.getAllFilteredMessages = async (req, res, next) => {
   const { meetingId } = req.params;
 
   try {
-    const filteredMessages = await meetingService.getAllFilteredMessages(meetingId);
+    const filteredMessages = await meetingService.getAllFilteredMessages(
+      meetingId
+    );
 
-    if(!filteredMessages) {
+    if (!filteredMessages) {
       return res.status(200).json({
         result: RESPONSE.CAN_NOT_FIND,
-
       });
     }
 
@@ -123,7 +112,7 @@ exports.getAllFilteredMessages = async (req, res, next) => {
       result: RESPONSE.OK,
       filteredMessages,
     });
-  } catch(error) {
+  } catch (error) {
     next(error);
   }
 };
