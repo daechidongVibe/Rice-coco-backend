@@ -57,8 +57,8 @@ exports.signup = async (req, res, next) => {
 
   try {
     const user = await userService.signup(userInfo);
-    const { _id, email } = user;
-    const token = jwt.sign({ _id, email }, process.env.JWT_SECRET);
+    const { _id: userId, email } = user;
+    const token = jwt.sign({ userId, email }, process.env.JWT_SECRET);
 
     res.status(201).json({ result: RESPONSE.OK, token, user });
   } catch (error) {

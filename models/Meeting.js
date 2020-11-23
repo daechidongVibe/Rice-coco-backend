@@ -39,9 +39,8 @@ const MeetingSchema = new Schema(
 );
 
 MeetingSchema.pre('save', function(next) {
-  this.expiredTime = new Date(Date.now() +( 60 * 1000 ));
+  this.expiredTime = new Date(Date.now() +( 60 * 60 * 1000 ));
   next();
 });
-
 
 module.exports = mongoose.model('Meeting', MeetingSchema);
