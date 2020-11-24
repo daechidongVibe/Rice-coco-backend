@@ -63,8 +63,6 @@ exports.getAllFilteredMeetings = async userId => {
     });
   }
 
-  console.log(filteredMeetings);
-
   return filteredMeetings;
 };
 
@@ -122,7 +120,7 @@ exports.joinMeeting = async (meetingId, userId) => {
         $addToSet: { participant: { _id: userId } },
         $set: {
           isMatched: true,
-          expiredTime: new Date(Date.now() + 15 * 1000),
+          expiredTime: new Date(Date.now() + 60 * 60 * 1000),
         },
       },
       { new: true }
@@ -144,7 +142,7 @@ exports.finishMeeting = async meetingId => {
 
 exports.deleteMeeting = async meetingId => {
   try {
-    return await Meeting.findByIdAndRemove({ _id: meetingId });
+    await Meeting.findByIdAndRemove(meetingId);
   } catch (error) {
     throw new Error(error);
   }

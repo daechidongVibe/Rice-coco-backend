@@ -24,10 +24,10 @@ exports.login = async (req, res, next) => {
       const { email } = jwt.verify(token, process.env.JWT_SECRET);
       const user = await userService.login(email);
 
-      res.status(200).json({ result: 'ok', user });
+      res.status(200).json({ result: RESPONSE.OK, user });
     } catch (error) {
       console.error(error);
-      res.status(401).json({ error: 'unauthorized' });
+      res.status(401).json({ result: RESPONSE.UNAUTHORIZED });
     }
 
     return;
@@ -86,10 +86,7 @@ exports.updatePreferredPartner = async (req, res, next) => {
   const newPartnerConditions = req.body;
 
   try {
-    const { preferredPartner } = await userService.updatePreferredPartner(
-      userId,
-      newPartnerConditions
-    );
+    const { preferredPartner } = await userService.updatePreferredPartner(userId, newPartnerConditions);
 
     res.status(200).json({ result: RESPONSE.OK, preferredPartner });
   } catch (error) {

@@ -3,6 +3,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors');
+const verifyToken = require('../middlewares/verifyToken');
 
 const initLoaders = app => {
   app.set('views', path.join(__dirname, '/../views'));
@@ -14,6 +15,7 @@ const initLoaders = app => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   app.use(express.static(path.join(__dirname, '/../public')));
+  app.use(verifyToken);
 };
 
 module.exports = initLoaders;
