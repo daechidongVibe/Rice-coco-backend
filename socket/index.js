@@ -6,37 +6,40 @@ const initSocket = server => {
   const io = socketIo(server);
 
   io.on('connection', socket => {
+    socket.on('create meeting', async ({ meetingId, userId }) => {
+      const currentMeeting = {
+        meetingId,
+        users: [userId],
+        arrivalCount: 0,
+      };
+
+      meetingList[meetingId] = currentMeeting;
+
+      socket.meetingId = meetingId;
+      socket.join(meetingId);
+    });
+
     socket.on('join meeting', async ({ meetingId, userId }) => {
-      let currentMeeting = meetingList[meetingId];
+      const currentMeeting = meetingList[meetingId];
+      const isUserIn = currentMeeting.users.includes(userId);
 
-      if (currentMeeting && !currentMeeting.users.includes(userId)) {
-        currentMeeting.users.push(userId);
-      }
+      if (isUserIn) return;
 
-      if (!currentMeeting) {
-        currentMeeting = {
-          meetingId,
-          users: [userId],
-          arrivalCount: 0,
-        };
+      currentMeeting.users.push(userId);
 
-        meetingList[meetingId] = currentMeeting;
-      }
-
-      const isMeetingMatched = currentMeeting && currentMeeting.users.length === 2;
-
-      if (isMeetingMatched) {
-        try {
-          await meetingService.joinMeeting(meetingId, userId);
-        } catch (error) {
-          console.error(error);
-        }
+      try {
+        await meetingService.joinMeeting(meetingId, userId);
+      } catch (error) {
+        console.error(error);
       }
 
       socket.meetingId = meetingId;
       socket.join(meetingId);
 
-      io.to(meetingId).emit('change current meeting', currentMeeting);
+      io.to(meetingId).emit('partner join meeting', {
+        meetingData: currentMeeting,
+        partnerId: userId,
+      });
     });
 
     socket.on('send message', async ({ userId, nickname, message }, callback) => {

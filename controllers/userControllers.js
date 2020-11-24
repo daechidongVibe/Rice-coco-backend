@@ -11,7 +11,7 @@ exports.getUserInfo = async (req, res, next) => {
     return res.json(result);
   } catch (error) {
     console.error(error);
-    next(err);
+    next(error);
   }
 };
 
