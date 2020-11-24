@@ -9,6 +9,8 @@ initLoader(app);
 dbLoader();
 
 const ROUTES = require('./constants/routes');
+const RESPONSE = require('./constants/response');
+
 const usersRouter = require('./routes/usersRouter');
 const meetingsRouter = require('./routes/meetingsRouter');
 const paymentRouter = require('./routes/paymentRouter');
@@ -22,11 +24,11 @@ app.use(function (req, res, next) {
 });
 
 app.use(function (err, req, res, next) {
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  console.error(err);
 
-  res.status(err.status || 500);
-  res.render('error');
+  err.status
+    ? res.status(err.status).json({ result: err.message })
+    : res.status(500).json({ result: RESPONSE.INTERNAL_SEVER_ERROR });
 });
 
 module.exports = app;

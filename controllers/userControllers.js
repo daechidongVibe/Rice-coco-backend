@@ -17,12 +17,11 @@ exports.getUserInfo = async (req, res, next) => {
 
 exports.login = async (req, res, next) => {
   const token = req.get('authorization');
-  const { email } = req.body;
 
   if (token !== 'null') {
     try {
-      const { email } = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await userService.login(email);
+      const decodedUser = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await userService.login(decodedUser.email);
 
       res.status(200).json({ result: RESPONSE.OK, user });
     } catch (error) {
@@ -32,6 +31,8 @@ exports.login = async (req, res, next) => {
 
     return;
   }
+
+  const { email } = req.body;
 
   try {
     const user = await userService.login(email);
@@ -86,7 +87,10 @@ exports.updatePreferredPartner = async (req, res, next) => {
   const newPartnerConditions = req.body;
 
   try {
-    const { preferredPartner } = await userService.updatePreferredPartner(userId, newPartnerConditions);
+    const { preferredPartner } = await userService.updatePreferredPartner(
+      userId,
+      newPartnerConditions
+    );
 
     res.status(200).json({ result: RESPONSE.OK, preferredPartner });
   } catch (error) {
@@ -115,7 +119,10 @@ exports.addFavoritePartners = async (req, res, next) => {
 
   try {
     const partnerId = await userService.getPartnerIdByNickname(partnerNickname);
-    const updatedUser = await userService.addFavoritePartners(userId, partnerId);
+    const updatedUser = await userService.addFavoritePartners(
+      userId,
+      partnerId
+    );
 
     res.status(200).json({ result: RESPONSE.OK, updatedUser });
   } catch (err) {
