@@ -9,12 +9,10 @@ initLoader(app);
 dbLoader();
 
 const ROUTES = require('./constants/routes');
-const homeRouter = require('./routes/homeRouter');
 const usersRouter = require('./routes/usersRouter');
 const meetingsRouter = require('./routes/meetingsRouter');
 const paymentRouter = require('./routes/paymentRouter');
 
-app.use(ROUTES.HOME, homeRouter);
 app.use(ROUTES.USERS, usersRouter);
 app.use(ROUTES.MEETINGS, meetingsRouter);
 app.use(ROUTES.PAYMENT, paymentRouter);

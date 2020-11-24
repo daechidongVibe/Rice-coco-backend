@@ -1,5 +1,5 @@
 const socketIo = require('socket.io');
-const meetingService = require('./services/meetingService');
+const meetingService = require('../services/meetingService');
 const meetingList = {};
 
 const initSocket = server => {
@@ -36,8 +36,6 @@ const initSocket = server => {
       socket.meetingId = meetingId;
       socket.join(meetingId);
 
-      console.log(meetingList);
-
       io.to(meetingId).emit('change current meeting', currentMeeting);
     });
 
@@ -61,6 +59,8 @@ const initSocket = server => {
     });
 
     socket.on('send location', async ({ location }) => {
+      console.log(socket.id);
+      console.log(location);
       socket.broadcast
         .to(socket.meetingId)
         .emit('get partner location', location);
