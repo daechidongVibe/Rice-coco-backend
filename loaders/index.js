@@ -3,7 +3,6 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors');
-const verifyToken = require('../middlewares/verifyToken');
 
 const initLoaders = app => {
   app.set('views', path.join(__dirname, '/../views'));

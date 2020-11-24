@@ -3,13 +3,6 @@ const RESPONSE = require('../constants/response');
 const ROUTES = require('../constants/routes');
 
 const verifyToken = async (req, res, next) => {
-  if (
-    req.path === `${ROUTES.USERS}${ROUTES.LOGIN}` ||
-    req.path === `${ROUTES.USERS}${ROUTES.SIGNUP}`
-  ) {
-    return next();
-  }
-
   let token;
 
   if (req.path === '/payment') {
