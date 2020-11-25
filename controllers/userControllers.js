@@ -70,15 +70,15 @@ exports.signup = async (req, res, next) => {
 
 exports.updateUserInfo = async (req, res, next) => {
   const { userId } = req.params;
-  const { userInfo } = req.body;
+  const userInfo = req.body;
 
   try {
-    const updatedUser = await userService.updateUserInfo(userId, userInfo);
+    const { nickname, occupation} = await userService.updateUserInfo(userId, userInfo);
 
-    res.status(200).json({ result: RESPONSE.OK, updatedUser });
+    res.status(200).json({ result: RESPONSE.OK, nickname, occupation });
   } catch (error) {
     console.log(error);
-    next(err);
+    next(error);
   }
 };
 
