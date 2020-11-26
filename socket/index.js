@@ -55,12 +55,6 @@ const initSocket = server => {
       }
     );
 
-    socket.on('send notification', async ({ nickname, message }) => {
-      socket.broadcast
-        .to(socket.meetingId)
-        .emit('notification recived', { nickname, message });
-    });
-
     socket.on('send location', async ({ location }) => {
       console.log(socket.id);
       console.log(location);
