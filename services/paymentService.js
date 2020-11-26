@@ -1,7 +1,7 @@
 const Payment = require('../models/Payment');
 const User = require('../models/User');
 
-exports.createService = async (userId, amount, productInfo) => {
+exports.createPayment = async (userId, amount, productInfo) => {
   const payment = await Payment.create({
     buyer: userId,
     amount,

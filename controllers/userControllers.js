@@ -73,12 +73,12 @@ exports.updateUserInfo = async (req, res, next) => {
   const userInfo = req.body;
 
   try {
-    const { nickname, occupation} = await userService.updateUserInfo(userId, userInfo);
+    const { nickname, occupation } = await userService.updateUserInfo(userId, userInfo);
 
     res.status(200).json({ result: RESPONSE.OK, nickname, occupation });
   } catch (error) {
-    console.log(error);
-    next(error);
+    console.error(error);
+    next(err);
   }
 };
 
