@@ -3,14 +3,11 @@ const RESPONSE = require('../constants/response');
 const ROUTES = require('../constants/routes');
 
 const verifyToken = async (req, res, next) => {
-  let token;
+  let token = req.get('authorization');
 
-  if (req.path === '/payment') {
+  if (req.baseUrl === '/payment') {
     const { authToken } = req.query;
-
     token = authToken;
-  } else {
-    token = req.get('authorization');
   }
 
   try {

@@ -8,10 +8,9 @@ exports.createPayment = async (req, res, next) => {
   try {
     const { userId } = res.locals.userInfo;
     const { amount, productInfo } = req.body;
+    const result = await paymentService.createPayment(userId, amount, productInfo);
 
-    const result = await paymentService.createService(userId, amount, productInfo);
-
-    res.json(result);
+    res.status(200).json(result);
   } catch (err) {
     next(err);
   }
@@ -19,7 +18,6 @@ exports.createPayment = async (req, res, next) => {
 
 exports.authenticatePayment = async (req, res, next) => {
   const { userId } = res.locals.userInfo;
-
   // 웹뷰에서 결제시도 이후 해당 API로 리다이렉트
 
   // imp_success 로 결제 성공여부 판단
@@ -27,7 +25,7 @@ exports.authenticatePayment = async (req, res, next) => {
   // merchant_uid - RICE COCO 서버 DB 에 만들어진 결제정보 id
   const { imp_success, imp_uid, merchant_uid } = req.query;
 
-  const isPaymentSucceed = imp_success === 'false' ? false : true;
+  const isPaymentSucceed = imp_success !== 'false';
 
   // 결제 Authentication (교차 검증)
   if (isPaymentSucceed) {
