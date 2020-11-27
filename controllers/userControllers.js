@@ -125,8 +125,8 @@ exports.addFavoritePartners = async (req, res, next) => {
     );
 
     res.status(200).json({ result: RESPONSE.OK, updatedUser });
-  } catch (err) {
+  } catch (error) {
     console.error(error);
-    next(err);
+    next(error);
   }
 };

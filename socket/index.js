@@ -23,6 +23,9 @@ const initSocket = server => {
       const currentMeeting = meetingList[meetingId];
       const isUserIn = currentMeeting.users.includes(userId);
 
+      socket.meetingId = meetingId;
+      socket.join(meetingId);
+
       if (isUserIn) return;
 
       currentMeeting.users.push(userId);
@@ -32,9 +35,6 @@ const initSocket = server => {
       } catch (error) {
         console.error(error);
       }
-
-      socket.meetingId = meetingId;
-      socket.join(meetingId);
 
       io.to(meetingId).emit('partner join meeting', {
         meetingData: currentMeeting,
@@ -56,8 +56,6 @@ const initSocket = server => {
     );
 
     socket.on('send location', async ({ location }) => {
-      console.log(socket.id);
-      console.log(location);
       socket.broadcast
         .to(socket.meetingId)
         .emit('get partner location', location);
