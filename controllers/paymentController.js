@@ -18,18 +18,10 @@ exports.createPayment = async (req, res, next) => {
 
 exports.authenticatePayment = async (req, res, next) => {
   const { userId } = res.locals.userInfo;
-  // 웹뷰에서 결제시도 이후 해당 API로 리다이렉트
-
-  // imp_success 로 결제 성공여부 판단
-  // imp_uid - 아임포트 결제정보 id
-  // merchant_uid - RICE COCO 서버 DB 에 만들어진 결제정보 id
   const { imp_success, imp_uid, merchant_uid } = req.query;
-
   const isPaymentSucceed = imp_success !== 'false';
 
-  // 결제 Authentication (교차 검증)
   if (isPaymentSucceed) {
-    // 1. 아임포트 accessToken 발행
     const getToken = await axios({
       url: "https://api.iamport.kr/users/getToken",
       method: "post",
@@ -41,10 +33,6 @@ exports.authenticatePayment = async (req, res, next) => {
     });
 
     const { access_token } = getToken.data.response;
-
-    console.log('액세스 토큰! => ', access_token);
-
-    // 2. 발급받은 토큰과 imp_uid로 아임포트 서버에 실제로 결제된 정보 조회
     const getPaymentInfo = await axios({
       url: `https://api.iamport.kr/payments/${imp_uid}`,
       method: "get",
@@ -52,20 +40,10 @@ exports.authenticatePayment = async (req, res, next) => {
     });
 
     const paymentData = getPaymentInfo.data.response;
-
-    console.log('아임포트에서 조회한 결제정보! => ', paymentData);
-
-    // 3. RICE COCO DB에 저장되어 있는 주문 정보 조회
     const order = await Payment.findById(paymentData.merchant_uid);
     const amountToBePaid = order.amount;
     const promiseToBeUpdate = order.productInfo.amount;
-
-    // 4. 아임포트의 결제정보(paymentData)와 RICE COCO의 주문정보(order)의 결제 금액을 비교하고, 이상이 없다면 검증된 데이터를 RICE COCO 서버 DB에 저장
     const { amount, status } = paymentData;
-
-    console.log('아임포트 결제정보의 금액 => ', amount);
-    console.log('Rice coco 주문정보의 금액 => ', amountToBePaid);
-    console.log('둘이 같은가요? => ', amount === amountToBePaid);
 
     if (amount === amountToBePaid) {
       await Payment.findByIdAndUpdate(
@@ -78,14 +56,11 @@ exports.authenticatePayment = async (req, res, next) => {
         }
       );
 
-      // 유저 인포를 가져오고, 프로미스 수 업데이트
       const updatedUserInfo = await User.findByIdAndUpdate(
         userId,
         { $inc: { promise: promiseToBeUpdate } },
         { new: true }
       );
-
-      console.log('유저 프로미스 잘 업데이트 되었는지 확인', updatedUserInfo);
 
       const { nickname, promise } = updatedUserInfo;
 
