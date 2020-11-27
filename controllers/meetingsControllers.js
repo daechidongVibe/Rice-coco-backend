@@ -12,7 +12,7 @@ exports.createMeeting = async (req, res, next) => {
 
     res.status(201).json({ result: RESPONSE.OK, createdMeeting });
   } catch (error) {
-    console.warn(error);
+    console.error(error);
     next(error);
   }
 };
@@ -25,7 +25,7 @@ exports.getAllFilteredMeetings = async (req, res, next) => {
 
     res.status(200).json({ result: RESPONSE.OK, filteredMeetings });
   } catch (error) {
-    console.warn(error);
+    console.error(error);
     next(error);
   }
 };
@@ -39,7 +39,7 @@ exports.getMeetingDetail = async (req, res, next) => {
 
     res.status(200).json({ result: RESPONSE.OK, meetingDetails });
   } catch (error) {
-    console.warn(error);
+    console.error(error);
     next(error);
   }
 };
