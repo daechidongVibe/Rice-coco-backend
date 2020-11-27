@@ -62,8 +62,6 @@ const initSocket = server => {
     });
 
     socket.on('send location', async ({ location }) => {
-      console.log(socket.id);
-      console.log(location);
       socket.broadcast
         .to(socket.meetingId)
         .emit('get partner location', location);
