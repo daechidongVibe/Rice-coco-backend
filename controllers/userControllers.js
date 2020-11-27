@@ -7,8 +7,7 @@ exports.getUserInfo = async (req, res, next) => {
 
   try {
     const result = await userService.getUserInfo(userId);
-
-    return res.json(result);
+    return res.status(200).json(result);
   } catch (error) {
     console.error(error);
     next(error);
@@ -33,7 +32,7 @@ exports.login = async (req, res, next) => {
   }
 
   const { email } = req.body;
-
+  console.log(email)
   try {
     const user = await userService.login(email);
 
@@ -44,10 +43,12 @@ exports.login = async (req, res, next) => {
     }
 
     const { _id: userId } = user;
+    console.log('id', userId)
     const token = jwt.sign({ userId, email }, process.env.JWT_SECRET);
 
     res.status(200).json({ result: RESPONSE.OK, user, token });
   } catch (error) {
+    console.log(error.message)
     console.error(error);
     next(error);
   }
@@ -78,7 +79,7 @@ exports.updateUserInfo = async (req, res, next) => {
     res.status(200).json({ result: RESPONSE.OK, nickname, occupation });
   } catch (error) {
     console.error(error);
-    next(err);
+    next(error);
   }
 };
 
@@ -125,8 +126,8 @@ exports.addFavoritePartners = async (req, res, next) => {
     );
 
     res.status(200).json({ result: RESPONSE.OK, updatedUser });
-  } catch (err) {
+  } catch (error) {
     console.error(error);
-    next(err);
+    next(error);
   }
 };

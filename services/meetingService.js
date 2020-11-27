@@ -154,7 +154,7 @@ exports.updateChat = async (meetingId, userId, nickname, message) => {
       { _id: meetingId },
       { $push: { chat: { userId, nickname, message } } }
     );
-  } catch (err) {
+  } catch (error) {
     throw new Error(error);
   }
 };
@@ -165,7 +165,7 @@ exports.getAllFilteredMessages = async meetingId => {
     const { chat } = meeting.populate('chat');
 
     return chat;
-  } catch (err) {
+  } catch (error) {
     throw new Error(error);
   }
 };
