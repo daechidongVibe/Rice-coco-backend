@@ -18,7 +18,7 @@ const RestaurantSchema = new Schema({
 
 const ChatSchema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'User' },
-  nickname: {type: String, required: true},
+  nickname: { type: String, required: true },
   message: { type: String, required: true },
 });
 
@@ -38,8 +38,8 @@ const MeetingSchema = new Schema(
   schemaOptions
 );
 
-MeetingSchema.pre('save', function(next) {
-  this.expiredTime = new Date(Date.now() +( 60 * 60 * 1000 ));
+MeetingSchema.pre('save', function (next) {
+  this.expiredTime = new Date(Date.now() + 60 * 60 * 1000);
   next();
 });
 
