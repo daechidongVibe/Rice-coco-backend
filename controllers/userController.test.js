@@ -28,6 +28,8 @@ describe('user Controller', () => {
     status.returns(res);
     next = sinon.spy();
   });
+  afterEach(() => {
+  });
 
   describe('getUserInfo', () => {
     it('should execute next function on server error', async () => {
@@ -37,10 +39,8 @@ describe('user Controller', () => {
 
     it('get user info with status 200', async () => {
       const fakeUserInfo = faker.random.word();
-
       sinon.stub(userService, 'getUserInfo').returns(fakeUserInfo);
       await Controller.getUserInfo(req, res, next);
-
       expect(status.args[0][0]).to.equal(200);
       expect(json.args[0][0]).to.equal(fakeUserInfo);
     });
@@ -51,7 +51,6 @@ describe('user Controller', () => {
     const fakeUserInfo = { _id: fakeUserId };
     const fakeEmail = faker.internet.email();
     const fakeToken = jwt.sign({ fakeUserId, fakeEmail }, 'ricecoco');
-
     sinon.stub(userService, 'login').returns(fakeUserInfo);
 
     it('should not login a user when token is expired', async () => {
@@ -63,11 +62,10 @@ describe('user Controller', () => {
         }
       };
       await Controller.login(req, res, next);
-
       expect(status.args[0][0]).to.equal(401);
       expect(json.args[0][0].result).to.equal(RESPONSE.UNAUTHORIZED);
     });
-    // sinon.stub(userService, 'login').throws();
+
     it('should login a user when token is provided', async () => {
       sinon.stub(jwt, 'verify').returns(fakeToken);
       req = {
@@ -76,9 +74,7 @@ describe('user Controller', () => {
           authorization: fakeToken,
         }
       };
-
       await Controller.login(req, res, next);
-
       expect(status.args[0][0]).to.equal(200);
       expect(json.args[0][0].result).to.equal(RESPONSE.OK);
       expect(json.args[0][0].user).to.equal(fakeUserInfo);
