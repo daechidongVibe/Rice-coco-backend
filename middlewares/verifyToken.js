@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const RESPONSE = require('../constants/response');
-const ROUTES = require('../constants/routes');
 
 const verifyToken = async (req, res, next) => {
   let token = req.get('authorization');

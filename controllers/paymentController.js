@@ -40,9 +40,9 @@ exports.authenticatePayment = async (req, res, next) => {
     });
 
     const paymentData = getPaymentInfo.data.response;
-    const order = await Payment.findById(paymentData.merchant_uid);
-    const amountToBePaid = order.amount;
-    const promiseToBeUpdate = order.productInfo.amount;
+    const orderInfo = await Payment.findById(paymentData.merchant_uid);
+    const amountToBePaid = orderInfo.amount;
+    const promiseToBeUpdate = orderInfo.productInfo.amount;
     const { amount, status } = paymentData;
 
     if (amount === amountToBePaid) {
