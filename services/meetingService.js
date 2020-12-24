@@ -120,7 +120,7 @@ exports.joinMeeting = async (meetingId, userId) => {
         $addToSet: { participant: { _id: userId } },
         $set: {
           isMatched: true,
-          expiredTime: new Date(Date.now() + 2 * 60 * 1000),
+          expiredTime: new Date(Date.now() + 30 * 60 * 1000),
         },
       },
       { new: true }
@@ -128,7 +128,7 @@ exports.joinMeeting = async (meetingId, userId) => {
 
     return updatedMeeting;
   } catch (error) {
-    throw new Error(error);
+   qz throw new Error(error);
   }
 };
 
