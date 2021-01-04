@@ -128,7 +128,7 @@ exports.joinMeeting = async (meetingId, userId) => {
 
     return updatedMeeting;
   } catch (error) {
-   qz throw new Error(error);
+    throw new Error(error);
   }
 };
 
