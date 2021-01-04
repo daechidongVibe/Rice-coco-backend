@@ -38,7 +38,7 @@
 - ES2015+
 - React Native for component-based-architecture
 - Redux for state management
-- Styled Componenㅅ
+- Styled Component
 - Socket.io for real-time communication
 - Jest for unit-test
 - Enzyme for component-test
